@@ -11,6 +11,8 @@ for the WLMS calculator.
   * Each task has to perform a certain number of operations
   * Each core can do a certain number of operations per second
 
+SRS Document: [Link](ttps://docs.google.com/document/d/1g--pYhwbrSz8m2XrJJcEpc3w8EcNSufa_GrJhrKdfn4/edit)
+
 ## Installation
 
 ```
