@@ -58,16 +58,3 @@ class CalcValueError(CalcError):
 
         super(CalcValueError, self).__init__(msg)
 
-
-class CalcMissingError(CalcError):
-
-    """
-    MissingError is raised when an attribute that is mandatory is left
-    unassigned by the user
-    """
-
-    def __init__(self, obj, missing_attribute):
-
-        msg = 'Attribute %s in %s undefined' % (str(missing_attribute), str(obj))
-        super(CalcMissingError, self).__init__(msg)
-

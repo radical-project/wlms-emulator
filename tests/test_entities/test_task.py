@@ -22,6 +22,6 @@ def test_node_execute():
     n.task = t
     n.execute()
 
-    assert t.start_time
+    assert t.start_time == 0
     assert t.end_time
     assert t.exec_node == n.uid

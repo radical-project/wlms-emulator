@@ -1,6 +1,4 @@
 import radical.utils as ru
-from threading import Thread
-from time import sleep, time
 from .task import Task
 from ..exceptions import *
 
@@ -11,7 +9,6 @@ class Node(object):
         self._uid = ru.generate_id('node')
         self._perf = perf
         self._util = list()
-        self._task = None
         self._task_history = list()
 
     @property
@@ -27,10 +24,6 @@ class Node(object):
         return self._util
 
     @property
-    def task(self):
-        return self._task
-
-    @property
     def task_history(self):
         return self._task_history
 
@@ -42,27 +35,19 @@ class Node(object):
 
         self._perf = val
 
-    @util.setter
-    def util(self, val):
+    def execute(self, task):
 
-        if not isinstance(val, list):
-            raise CalcTypeError(expected_type=list, actual_type=type(val))
+        if not isinstance(task, Task):
+            raise CalcTypeError(expected_type=Task, actual_type=type(task))
 
-        self._util = val
+        dur = task.ops / self._perf
 
-    @task.setter
-    def task(self, val):
+        if not self._util:
+            task.start_time = 0
+        else:
+            task.start_time = self._util[-1][1]
 
-        self._task = val
-
-    def execute(self):
-
-        if not self._task:
-            raise CalcMissingError(obj=self._uid, missing_attribute='task')
-
-        dur = self._task.ops / self._perf
-        self._task.start_time = time()
-        self._task.end_time = self._task.start_time + dur
-        self._util.append([self._task.start_time, self._task.end_time])
-        self._task_history.append(self._task.uid)
-        self._task.exec_node = self._uid
+        task.end_time = task.start_time + dur
+        self._util.append([task.start_time, task.end_time])
+        self._task_history.append(task.uid)
+        task.exec_node = self._uid
