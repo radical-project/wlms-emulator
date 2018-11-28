@@ -1,2 +1,8 @@
-task_selector:
-  - 
+criteria:
+  - task_selector: 'all'
+  - resource_selector: 'all'
+  - binder: 'tte'
+
+rmq:
+  - host: 'two.radical-project.org'
+  - port: 33202
