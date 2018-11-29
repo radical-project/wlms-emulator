@@ -1,8 +1,20 @@
 criteria:
-  - task_selector: 'all'
-  - resource_selector: 'all'
-  - binder: 'tte'
+  task_selector: 'all'
+  resource_selector: 'all'
+  binder: 'tte'
 
 rmq:
-  - host: 'two.radical-project.org'
-  - port: 33202
+  host: 'two.radical-project.org'
+  port: 33202
+
+  wlms:
+    exchange: 'wlms'
+    queues:
+      workload: 'wl'
+      resource: 'res'
+      config: 'cfg'
+
+  executor:
+    exchange: 'executor'
+    queues:
+      schedule: 'schedule'

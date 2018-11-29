@@ -67,17 +67,21 @@ class WLMS(object):
 
         chan.exchange_declare(exchange='wlms', exchange_type='direct')
 
-        chan.queue_declare(queue='wl', exclusive=True)
-        chan.queue_declare(queue='res', exclusive=True)
-        chan.queue_declare(queue='cfg', exclusive=True)
+        chan.queue_declare(queue='wl')
+        chan.queue_declare(queue='res')
+        chan.queue_declare(queue='cfg')
 
         chan.queue_bind(queue='wl', exchange='wlms', routing_key='wl')
         chan.queue_bind(queue='res', exchange='wlms', routing_key='res')
         chan.queue_bind(queue='cfg', exchange='wlms', routing_key='cfg')
 
+        conn.close()
+
         self._logger.info('Messaging system established')
 
     def run(self):
+
+        conn = None
 
         try:
 
@@ -138,12 +142,18 @@ class WLMS(object):
 
 
 
-        raise KeyboardInterrupt:
+        except KeyboardInterrupt:
+
+            if conn:
+                conn.close()
 
             self._logger.info('Closing %s'%self._uid)
 
 
-        raise Exception as ex:
+        except Exception as ex:
+
+            if conn:
+                conn.close()
 
             self._logger.exception('WLMS failed with %s'%ex)
 

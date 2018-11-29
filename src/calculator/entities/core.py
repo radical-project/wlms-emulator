@@ -2,11 +2,13 @@ import radical.utils as ru
 from .task import Task
 from ..exceptions import *
 
-class Node(object):
+class Core(object):
 
-    def __init__(self, perf=0):
+    def __init__(self, perf=0, no_uid=False):
 
-        self._uid = ru.generate_id('node')
+        self._uid = None
+        if not no_uid:
+            self._uid = ru.generate_id('core')
         self._perf = perf
         self._util = list()
         self._task_history = list()
@@ -29,16 +31,13 @@ class Node(object):
 
     @perf.setter
     def perf(self, val):
-
-        if not (isinstance(val, float) or isinstance(val, int)):
-            raise CalcTypeError(expected_type=[float,int], actual_type=type(val))
-
         self._perf = val
 
-    def execute(self, task):
+    @util.setter
+    def util(self, val):
+        self._util = val
 
-        if not isinstance(task, Task):
-            raise CalcTypeError(expected_type=Task, actual_type=type(task))
+    def execute(self, task):
 
         dur = task.ops / self._perf
 
@@ -50,4 +49,19 @@ class Node(object):
         task.end_time = task.start_time + dur
         self._util.append([task.start_time, task.end_time])
         self._task_history.append(task.uid)
-        task.exec_node = self._uid
+        task.exec_core = self._uid
+
+    def to_dict(self):
+
+        return {'uid': self._uid,
+                'perf': self._perf,
+                'util': self._util,
+                'task_history': self._task_history
+            }
+
+    def from_dict(self, entry):
+
+        self._uid           = entry['uid']
+        self._perf          = entry['perf']
+        self._util          = entry['util']
+        self._task_history  = entry['task_history']

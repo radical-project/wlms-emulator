@@ -1,0 +1,16 @@
+#!/usr/bin/python
+
+import argparse
+from calculator.components.executor import Executor
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(usage='start-executor --cfg_path <path to config file>')
+    parser.add_argument('--cfg_path',
+                        help='path to a config file',
+                        dest='cfg',
+                        required=True)
+    args = parser.parse_args()
+
+    ex = Executor(cfg_path=args.cfg)
+    ex.run()
