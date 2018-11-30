@@ -2,7 +2,8 @@ def round_robin(workload, resource):
 
     m = list()
     for idx, task in enumerate(workload):
-        m.append({task: resource[idx%len(resource)]})
+        m.append({  'task': task,
+                    'core': resource[idx%len(resource)]})
 
     return m
 
@@ -14,7 +15,8 @@ def optimize_tte(workload, resource):
     resource = sorted(resource, key=lambda unit: unit.perf, reverse=True)
 
     for idx, task in enumerate(workload):
-        m.append({task: resource[idx % len(resource)]})
+        m.append({  'task': task,
+                    'core': resource[idx % len(resource)]})
 
     return m
 
@@ -25,7 +27,8 @@ def optimize_util(workload, resource):
     resource = sorted(resource, key=lambda unit: unit.perf, reverse=True)
 
     for idx, task in enumerate(workload):
-        m.append({task: resource[0]})
+        m.append({  'task': task,
+                    'core': resource[0]})
 
     return m
 

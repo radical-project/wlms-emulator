@@ -2,10 +2,12 @@ import radical.utils as ru
 from ..components.selector import Selector
 from ..components.binder import Binder
 from ..components.executor import Executor
+from ..api.resource import Resource
+from ..api.workload import Workload
 from ..exceptions import *
 from yaml import load
 import pika
-
+import json
 
 class WLMS(object):
 
@@ -33,6 +35,12 @@ class WLMS(object):
 
         self._host = cfg['rmq']['host']
         self._port = cfg['rmq']['port']
+        self._exchange = cfg['rmq']['wlms']['exchange']
+        self._tgt_exchange = cfg['rmq']['executor']['exchange']
+        self._wl_queue = cfg['rmq']['wlms']['queues']['workload']
+        self._res_queue = cfg['rmq']['wlms']['queues']['resource']
+        self._cfg_queue = cfg['rmq']['wlms']['queues']['config']
+
         self._set_criteria(cfg['criteria'])
         self._logger.info('Configuration parsed')
 
@@ -65,15 +73,15 @@ class WLMS(object):
             pika.ConnectionParameters(host=self._host, port=self._port))
         chan = conn.channel()
 
-        chan.exchange_declare(exchange='wlms', exchange_type='direct')
+        chan.exchange_declare(exchange=self._exchange, exchange_type='direct')
 
-        chan.queue_declare(queue='wl')
-        chan.queue_declare(queue='res')
-        chan.queue_declare(queue='cfg')
+        chan.queue_declare(queue=self._wl_queue)
+        chan.queue_declare(queue=self._res_queue)
+        chan.queue_declare(queue=self._cfg_queue)
 
-        chan.queue_bind(queue='wl', exchange='wlms', routing_key='wl')
-        chan.queue_bind(queue='res', exchange='wlms', routing_key='res')
-        chan.queue_bind(queue='cfg', exchange='wlms', routing_key='cfg')
+        chan.queue_bind(queue=self._wl_queue, exchange=self._exchange, routing_key='wl')
+        chan.queue_bind(queue=self._res_queue, exchange=self._exchange, routing_key='res')
+        chan.queue_bind(queue=self._cfg_queue, exchange=self._exchange, routing_key='cfg')
 
         conn.close()
 
@@ -93,48 +101,55 @@ class WLMS(object):
 
             while True:
 
-                method_frame, header_frame, wl = chan.basic_get(queue='wl',
+                method_frame, header_frame, wl = chan.basic_get(queue=self._wl_queue,
                                                                 no_ack=True)
                 if wl and not workload:
-                    workload = wl.from_dict()
+                    workload = Workload(no_uid=True)
+                    workload.from_dict(json.loads(wl))
                     self._logger.info('Workload %s received'%workload.uid)
 
-                method_frame, header_frame, res = chan.basic_get(queue='res',
+                method_frame, header_frame, res = chan.basic_get(queue=self._res_queue,
                                                                  no_ack=True)
                 if res and not resource:
-                    resource = res.from_dict()
+                    resource = Resource(no_uid=True)
+                    resource.from_dict(json.loads(res))
                     self._logger.info('Resource %s received'%resource.uid)
 
                 if workload and resource:
 
                     sel = Selector()
                     sel.criteria = self._ts_criteria
-                    self._selected_tasks = sel.select(collection=self._workload.task_list,
-                                                      count=self._workload.num_tasks)
+                    selected_tasks = sel.select(collection=workload.task_list,
+                                                      count=workload.num_tasks)
                     self._logger.info('Task selection complete')
 
                     sel = Selector()
                     sel.criteria = self._rs_criteria
-                    self._selected_nodes = sel.select(collection=self._resource.node_list,
-                                                      count=self._resource.num_cores)
+                    selected_cores = sel.select(collection=resource.core_list,
+                                                      count=resource.num_cores)
                     self._logger.info('Resource selection complete')
 
                     m = Binder()
                     m.criteria = self._b_criteria
-                    self._schedule = m.bind(
-                        self._selected_tasks, self._selected_nodes)
-
+                    schedule = m.bind(selected_tasks, selected_cores)
                     self._logger.info('Binding complete')
 
-                    chan.basic_publish(exchange='executor',
+                    schedule_as_dict = list()
+                    for s in schedule:
+                        task_as_dict = s['task'].to_dict()
+                        core_as_dict = s['core'].to_dict()
+                        tmp = {'task': task_as_dict, 'core': core_as_dict}
+                        schedule_as_dict.append(tmp)
+
+                    chan.basic_publish(exchange=self._tgt_exchange,
                                        routing_key='schedule',
-                                       body=self._schedule)
+                                       body=json.dumps(schedule_as_dict))
 
                     self._logger.info('Schedule published to executor')
 
                     workload, resource = None, None
 
-                method_frame, header_frame, cfg = chan.basic_get(queue='cfg',
+                method_frame, header_frame, cfg = chan.basic_get(queue=self._cfg_queue,
                                                                  no_ack=True)
                 if cfg:
                     self._logger.info('Reassigning criteria')
@@ -156,5 +171,3 @@ class WLMS(object):
                 conn.close()
 
             self._logger.exception('WLMS failed with %s'%ex)
-
-        # return {'tte': e.get_tte(), 'util': e.get_util()}

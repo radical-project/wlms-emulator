@@ -50,6 +50,10 @@ class Resource(object):
             self._create_core_list()
 
     @property
+    def uid(self):
+        return self._uid
+
+    @property
     def num_cores(self):
         return self._num_cores
 

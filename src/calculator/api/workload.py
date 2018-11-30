@@ -28,6 +28,10 @@ class Workload(object):
             self._create_task_list()
 
     @property
+    def uid(self):
+        return self._uid
+
+    @property
     def num_tasks(self):
         return self._num_tasks
 

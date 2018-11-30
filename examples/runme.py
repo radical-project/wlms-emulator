@@ -1,6 +1,6 @@
 from calculator import Workload
 from calculator import Resource
-from calculator import WLMS
+from calculator import Engine
 from pprint import pprint
 
 if __name__ == '__main__':
@@ -23,16 +23,8 @@ if __name__ == '__main__':
 
     # Create WLMS instance with a workload, resource, selection criteria, and
     # binding criteria
-    eng = WLMS( workload=wl,                        # workload
-                resource=res,                       # resource
-                task_selection_criteria='all',      # task selection criteria -- currently selects all tasks
-                resource_selection_criteria='all',  # resource selection criteria -- currently selects all cores
-                binding_criteria='tte'              # binding criteria -- currently places task with largest number of
-                                                    # operations on core with maximum performance
-                )
+    eng = Engine( cfg_path='./config.yml')
 
     # Run given workload on resources using the configured WLMS
-    eng.run()
+    eng.run(wl, res)
 
-    # Print execution profile
-    eng.generate_profile()
