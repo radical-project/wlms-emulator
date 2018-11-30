@@ -1,12 +1,15 @@
 criteria:
-  task_selector: 'all'
-  resource_selector: 'all'
-  binder: 'tte'
+  task_selector: 'all'      # Criteria to be used by the task selector
+  resource_selector: 'all'  # Criteria to be used by the resource selector
+  binder: 'tte'             # Criteria to be used by the binder
 
 rmq:
-  host: 'two.radical-project.org'
-  port: 33202
+  host: 'two.radical-project.org'   # Hostname of the RMQ server
+  port: 33202                       # Port of the RMQ server
 
+# Do not change unless you expect a conflict in the RMQ server
+# There is a conflict only if you have multiple concurrent instances of this
+# wlms or other processes/applications are using the same exchange and queue names
   wlms:
     exchange: 'wlms'
     queues:

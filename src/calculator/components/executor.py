@@ -64,7 +64,7 @@ class Executor(object):
 
                     tasks = list()
                     schedule_as_dict = json.loads(schedule)
-                    print 'SCHEDULE', schedule
+
                     for s in schedule_as_dict:
                         task = Task(no_uid=True)
                         task.from_dict(s['task'])
@@ -114,7 +114,5 @@ class Executor(object):
         fname, ext = os.path.basename(self._profile_loc).split('.')
         op_name = base + '/' + fname + '.%s.'%self._uid + ext
 
-        with open(op_name,'w') as fp:
-            json.dump(fp=fp, obj=self._profile)
-
+        ru.write_json(data=self._profile, filename=op_name)
         self._logger.info('Profiles from executor %s written to %s'%(self._uid, op_name))

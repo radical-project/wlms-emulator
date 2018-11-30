@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
     # Create WLMS instance with a workload, resource, selection criteria, and
     # binding criteria
-    eng = Engine( cfg_path='./config.yml')
+    eng = Engine(cfg_path='./config.yml')
 
     # Run given workload on resources using the configured WLMS
     eng.run(wl, res)
