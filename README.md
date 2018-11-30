@@ -26,23 +26,46 @@ pip install .
 
 ## Executing the example
 
-The example can be executed with the following commands:
+The example can be executed by following three steps:
 
+1. Start the executor
+
+The executor can be started using the config file provided in the examples
+folder. The executor executes a given schedule and records the execution in
+a JSON file.
+
+In a new terminal, load the conda environment and execute:
 ```
+source activate ve_calc
 cd $HOME/wlms_calculator/examples
-python runme.py
+RADICAL_EXECUTOR_VERBOSE=INFO start-executor --cfg_path ./config.yml
 ```
 
-The output printed describes the execution profile in the following
-format:
+2. Start the WLMS
 
+The WLMS can be started using the config file provided in the examples
+folder. The WLMS, upon receiving a workload and a resource, selects tasks
+from the workload, selects a subset of resources from all available, and binds
+the tasks to cores (subset of resources) to create a schedule. This schedule is
+communicated to an executor.
+
+In a new terminal, load the conda environment and execute:
 ```
-Task: task.0 | Core: <core used to execute the task> | Start time: <time execution started> | End time: <time execution stopped> | Execution time: <execution time>
-Task: task.1 | Core: <core used to execute the task> | Start time: <time execution started> | End time: <time execution stopped> | Execution time: <execution time>
+source activate ve_calc
+cd $HOME/wlms_calculator/examples
+RADICAL_EXECUTOR_VERBOSE=INFO start-wlms --cfg_path ./config.yml
 ```
 
-## Adding selection and binding algorithms
+3. Create and submit the workload and resource
 
-Currently, there are 2-3 trivial selection and binding algorithms as part of
-the package. An API will be added to enable addition of algorithms via the
-user interface,
+In the runme Python file in the examples folder, we create a workload and 
+resource and submit it to an Engine object. This workload is executed on the
+resources by the executor as specified by the WLMS. You can see the various
+events by the verbose messages in the different terminals.
+
+In a new terminal, load the conda environment and execute:
+```
+source activate ve_calc
+cd $HOME/wlms_calculator/examples
+RADICAL_EXECUTOR_VERBOSE=INFO python runme.py
+```
