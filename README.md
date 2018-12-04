@@ -13,11 +13,16 @@ for the WLMS calculator.
 
 SRS Document: [Link](ttps://docs.google.com/document/d/1g--pYhwbrSz8m2XrJJcEpc3w8EcNSufa_GrJhrKdfn4/edit)
 
+## Requirements
+
+* Python 2.7
+* virtualenv or conda
+
 ## Installation
 
 ```
-conda create -n ve_calc
-source activate ve_calc
+conda create -n ve_calc   # or virtualenv $HOME/ve_calc
+source activate ve_calc   # or source activate $HOME/ve_calc/bin/activate
 cd $HOME
 git clone https://github.com/vivek-bala/wlms_calculator.git
 cd wlms_calculator
