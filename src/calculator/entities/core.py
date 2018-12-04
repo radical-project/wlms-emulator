@@ -8,7 +8,7 @@ class Core(object):
 
         self._uid = None
         if not no_uid:
-            self._uid = ru.generate_id('core')
+            self._uid = ru.generate_id('core',mode=ru.ID_PRIVATE)
         self._perf = perf
         self._util = list()
         self._task_history = list()

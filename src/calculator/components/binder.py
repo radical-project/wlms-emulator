@@ -7,7 +7,7 @@ class Binder(object):
     def __init__(self):
 
         self._uid = ru.generate_id('binder')
-        self._criteria_options = ['rr','tte', 'util']
+        self._criteria_options = ['rr','tte', 'util','random']
         self._criteria = None
         self._schedule = None
 
@@ -43,5 +43,8 @@ class Binder(object):
 
         elif self._criteria == 'util':
             self._schedule = optimize_util(workload, resource)
+
+        elif self._criteria == 'random':
+            self._schedule = random_placer(workload, resource)
 
         return self._schedule

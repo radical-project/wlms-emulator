@@ -9,14 +9,14 @@
 #    . 'all' = select all given resources
 #    . int = select all the resources that perform more than int operations
 #      per second
-# - binder: binding criterion. Current criteria are: 
+# - binder: binding criterion. Current criteria are:
 #    . 'tte' = bind the task with the largest number of operations to the
 #      resource that can perform the highest number of operations per second
 #    . 'rr' = bind tasks to resources in the order in which they are received.
 criteria:
   task_selector: 'all'      # Criteria to be used by the task selector
   resource_selector: 'all'  # Criteria to be used by the resource selector
-  binder: 'tte'             # Criteria to be used by the binder
+  binder: 'random'             # Criteria to be used by the binder
 
 # RabbitMQ parameters, should not be changed by the user.
 rmq:

@@ -61,7 +61,8 @@ setup_args = {
     'package_dir': {'': 'src'},
     'package_data':  {'': ['*.sh', '*.json', 'VERSION', 'SDIST']},
     'install_requires':  ['radical.utils', 'numpy', 'pytest', 'pyyaml',
-                          'hypothesis', 'pylint', 'flake8'],
+                          'hypothesis', 'pylint', 'flake8', 'pika',
+                          'pandas','matplotlib'],
 
     'zip_safe': False
 }

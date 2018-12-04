@@ -15,7 +15,7 @@ if __name__ == '__main__':
 
     # Create a resource with a specific number of cores with performance of each
     # core drawn from a distribution
-    res = Resource( num_cores=5,        # no.
+    res = Resource( num_cores=8,        # no.
                     perf_dist='uniform',# distribution to draw samples from
                     dist_mean=3,        # mean of distribution
                     dist_var=1          # variance of distribution
@@ -23,8 +23,7 @@ if __name__ == '__main__':
 
     # Create WLMS instance with a workload, resource, selection criteria, and
     # binding criteria
-    eng = Engine(cfg_path='./config.yml')
+    eng = Engine(cfg_path='./config_baseline.yml')
 
     # Run given workload on resources using the configured WLMS
     eng.run(wl, res)
-

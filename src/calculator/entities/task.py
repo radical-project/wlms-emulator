@@ -6,7 +6,7 @@ class Task(object):
 
         self._uid = None
         if not no_uid:
-            self._uid = ru.generate_id('task')
+            self._uid = ru.generate_id('task',mode=ru.ID_PRIVATE)
 
         self._ops = ops
         self._start_time = None

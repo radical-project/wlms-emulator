@@ -48,7 +48,7 @@ class WLMS(object):
 
         valid_ts_criteria = ['all']
         valid_rs_criteria = ['all']
-        valid_b_criteria = ['rr', 'tte', 'util']
+        valid_b_criteria = ['rr', 'tte', 'util','random']
 
         task_selection_criteria = cfg['task_selector']
         resource_selection_criteria = cfg['resource_selector']

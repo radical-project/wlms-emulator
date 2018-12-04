@@ -33,3 +33,16 @@ def optimize_util(workload, resource):
     return m
 
 
+def random_placer(workload, resource):
+
+    from random import shuffle
+
+    m = list()
+    shuffle(workload)
+    shuffle(resource)
+
+    for idx, task in enumerate(workload):
+        m.append({  'task': task,
+                    'core': resource[idx%len(resource)]})
+
+    return m
