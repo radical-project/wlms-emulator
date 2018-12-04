@@ -1,15 +1,31 @@
+# Assumptions:
+# Each task has a number of operations to perform
+# Each core has a number of operations it can perform per second
+
+# - task_selector = task selection criterion. Current criteria are:
+#    . 'all' = select all the tasks for execution
+#    . int = select all the tasks that have more than int operations
+# - resource_selector = resource selection criterion. E.g., select only
+#    . 'all' = select all given resources
+#    . int = select all the resources that perform more than int operations
+#      per second
+# - binder: binding criterion. Current criteria are: 
+#    . 'tte' = bind the task with the largest number of operations to the
+#      resource that can perform the highest number of operations per second
+#    . 'rr' = bind tasks to resources in the order in which they are received.
 criteria:
   task_selector: 'all'      # Criteria to be used by the task selector
   resource_selector: 'all'  # Criteria to be used by the resource selector
   binder: 'tte'             # Criteria to be used by the binder
 
+# RabbitMQ parameters, should not be changed by the user.
 rmq:
   host: 'two.radical-project.org'   # Hostname of the RMQ server
   port: 33202                       # Port of the RMQ server
 
-# Do not change unless you expect a conflict in the RMQ server
-# There is a conflict only if you have multiple concurrent instances of this
-# wlms or other processes/applications are using the same exchange and queue names
+# Do not change unless you expect a conflict in the RMQ server There is a
+# conflict only if you have multiple concurrent instances of this wlms or
+# other processes/applications are using the same exchange and queue names
   wlms:
     exchange: 'wlms'
     queues:
