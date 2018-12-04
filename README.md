@@ -41,7 +41,7 @@ a JSON file.
 
 In a new terminal, load the conda environment and execute:
 ```
-source activate ve_calc
+source activate ve_calc   # or source activate $HOME/ve_calc/bin/activate
 cd $HOME/wlms_calculator/examples
 RADICAL_EXECUTOR_VERBOSE=INFO start-executor --cfg_path ./config.yml
 ```
@@ -56,7 +56,7 @@ communicated to an executor.
 
 In a new terminal, load the conda environment and execute:
 ```
-source activate ve_calc
+source activate ve_calc   # or source activate $HOME/ve_calc/bin/activate
 cd $HOME/wlms_calculator/examples
 RADICAL_EXECUTOR_VERBOSE=INFO start-wlms --cfg_path ./config.yml
 ```
@@ -70,7 +70,7 @@ events by the verbose messages in the different terminals.
 
 In a new terminal, load the conda environment and execute:
 ```
-source activate ve_calc
+source activate ve_calc   # or source activate $HOME/ve_calc/bin/activate
 cd $HOME/wlms_calculator/examples
 RADICAL_EXECUTOR_VERBOSE=INFO python runme.py
 ```
