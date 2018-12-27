@@ -1,6 +1,6 @@
 import radical.utils as ru
-from ..components.selector import Selector
-from ..components.binder import Binder
+from ..components.selectors import Resource_Selector, Task_Selector
+from ..components.binders import Spatial_Binder, Temporal_Binder
 from ..components.executor import Executor
 from ..api.resource import Resource
 from ..api.workload import Workload
@@ -14,11 +14,8 @@ class WLMS(object):
     def __init__(self,
                  cfg_path):
 
-        self._uid = ru.generate_id('wlms')
+        self._uid = ru.generate_id('wlms', mode=ru.ID_UNIQUE)
         self._logger = ru.Logger('radical.wlms.%s' % self._uid)
-        self._workload = None
-        self._resource = None
-        self._schedule = list()
         self._ts_criteria = None
         self._rs_criteria = None
         self._b_criteria = None
@@ -49,7 +46,7 @@ class WLMS(object):
         valid_ts_criteria = ['all']
         valid_rs_criteria = ['all']
         valid_b_criteria = ['rr', 'tte', 'util','random']
-
+        print cfg
         task_selection_criteria = cfg['task_selector']
         resource_selection_criteria = cfg['resource_selector']
         binding_criteria = cfg['binder']
@@ -97,7 +94,7 @@ class WLMS(object):
                 pika.ConnectionParameters(host=self._host, port=self._port))
             chan = conn.channel()
 
-            workload, resource = None, None
+            workload, resource, submit_time = None, None, None
 
             while True:
 
@@ -106,6 +103,7 @@ class WLMS(object):
                 if wl and not workload:
                     workload = Workload(no_uid=True)
                     workload.from_dict(json.loads(wl))
+                    submit_time = workload['submit_time']
                     self._logger.info('Workload %s received'%workload.uid)
 
                 method_frame, header_frame, res = chan.basic_get(queue=self._res_queue,
@@ -117,22 +115,46 @@ class WLMS(object):
 
                 if workload and resource:
 
-                    sel = Selector()
-                    sel.criteria = self._ts_criteria
-                    selected_tasks = sel.select(collection=workload.task_list,
-                                                      count=workload.num_tasks)
-                    self._logger.info('Task selection complete')
-
-                    sel = Selector()
+                    sel = Resource_Selector()
                     sel.criteria = self._rs_criteria
                     selected_cores = sel.select(collection=resource.core_list,
-                                                      count=resource.num_cores)
+                                                count=resource.num_cores,
+                                                submit_time=submit_time)
                     self._logger.info('Resource selection complete')
 
-                    m = Binder()
-                    m.criteria = self._b_criteria
-                    schedule = m.bind(selected_tasks, selected_cores)
-                    self._logger.info('Binding complete')
+                    if not selected_cores:
+                        continue
+
+                    sel = Task_Selector()
+                    sel.criteria = self._ts_criteria
+                    selected_tasks = sel.select(collection=workload.task_list,
+                                                count=workload.num_tasks)
+                    self._logger.info('Task selection complete')
+
+                    if not selected_tasks:
+                        continue
+
+                    for task in selected_tasks:
+                        if 
+
+                    sb = Spatial_Binder()
+                    sb.criteria = self._b_criteria
+                    schedule = m.bind(  workload=selected_tasks, 
+                                        resource=selected_cores)
+                    self._logger.info('Spatial Binding complete')
+
+                    if not schedule:
+                        continue
+
+                    tb = Temporal_Binder()
+                    tb.criteria = self._b_criteria
+                    schedule = m.bind(  workload=selected_tasks,
+                                        resource=selected_cores,
+                                        submit_time=submit_time)
+                    self._logger.info('Temporal Binding complete')
+
+                    if not schedule:
+                        continue
 
                     schedule_as_dict = list()
                     for s in schedule:

@@ -24,7 +24,7 @@ class Workload(object):
         self._dist_var = dist_var
 
         if not no_uid:
-            self._uid = ru.generate_id('workload',mode=ru.ID_PRIVATE)
+            self._uid = ru.generate_id('workload')
             self._create_task_list()
 
     @property

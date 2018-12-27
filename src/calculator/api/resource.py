@@ -46,7 +46,7 @@ class Resource(object):
         self._dist_var = dist_var
 
         if not no_uid:
-            self._uid = ru.generate_id('resource',mode=ru.ID_PRIVATE)
+            self._uid = ru.generate_id('resource')
             self._create_core_list()
 
     @property

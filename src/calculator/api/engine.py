@@ -12,6 +12,7 @@ class Engine(object):
 
         self._resource = None
         self._workload = None
+        self._uid = ru.generate_id('engine', mode=ru.ID_UNIQUE)
         self._logger = ru.Logger('radical.engine')
 
         with open(cfg_path, 'r') as stream:
@@ -22,60 +23,64 @@ class Engine(object):
 
         self._host = cfg['rmq']['host']
         self._port = cfg['rmq']['port']
-        self._tgt_exchange = cfg['rmq']['wlms']['exchange']
+        self._wlms_exchange = cfg['rmq']['wlms']['exchange']
+        self._executor_exchange = cfg['rmq']['executor']['exchange']
         self._logger.info('Configuration parsed')
 
-    def run(self, workload, resource):
-
-        if not isinstance(workload, Workload):
-            raise CalcTypeError(expected_type=Workload,
-                                actual_type=type(workload)
-                            )
+    def assign_resource(self, resource):
 
         if not isinstance(resource, Resource):
             raise CalcTypeError(expected_type=Resource,
                                 actual_type=type(resource)
                             )
 
-        wl_as_dict = workload.to_dict()
         res_as_dict = resource.to_dict()
 
         conn = pika.BlockingConnection(
             pika.ConnectionParameters(host=self._host, port=self._port))
         chan = conn.channel()
 
-        chan.basic_publish( body=json.dumps(wl_as_dict),
-                            exchange=self._tgt_exchange,
-                            routing_key='wl'
-                        )
-
         chan.basic_publish( body=json.dumps(res_as_dict),
-                            exchange=self._tgt_exchange,
+                            exchange=self._wlms_exchange,
                             routing_key='res'
                         )
 
         conn.close()
 
-    def reset_cfg(self, cfg):
 
-        if not isinstance(cfg, dict):
-            raise CalcTypeError(expected_type=dict,
-                                actual_type=type(cfg)
-                            )
+    def assign_cfg(self):
 
-        if set(cfg.keys()) != set(['task_selector', 'resource_selector', 'binder']):
-            raise ValueError("cfg requires ['task_selector', 'resource_selector', 'binder'] keys")
-
-        if None in cfg.values():
-            raise ValueError('cfg keys cannot be None')
+        cfg_as_dict = {'engine_uid': self._uid}
 
         conn = pika.BlockingConnection(
             pika.ConnectionParameters(host=self._host, port=self._port))
         chan = conn.channel()
 
-        chan.basic_publish( body=json.dumps(cfg),
-                            exchange=self._tgt_exchange,
+        chan.basic_publish( body=json.dumps(cfg_as_dict),
+                            exchange=self._executor_exchange,
                             routing_key='cfg'
+                        )
+
+        conn.close()
+
+
+    def assign_workload(self, workload, submit_at):
+
+        if not isinstance(workload, Workload):
+            raise CalcTypeError(expected_type=Workload,
+                                actual_type=type(workload)
+                            )
+
+        wl_as_dict = workload.to_dict()
+        wl_as_dict['submit_time'] = submit_at
+
+        conn = pika.BlockingConnection(
+            pika.ConnectionParameters(host=self._host, port=self._port))
+        chan = conn.channel()
+
+        chan.basic_publish( body=json.dumps(wl_as_dict),
+                            exchange=self._wlms_exchange,
+                            routing_key='wl'
                         )
 
         conn.close()

@@ -12,11 +12,12 @@ class Executor(object):
 
     def __init__(self, cfg_path):
 
-        self._uid = ru.generate_id('executor')
+        self._uid = ru.generate_id('executor', mode=ru.ID_UNIQUE)
         self._logger = ru.Logger('radical.executor.%s' % self._uid)
 
         self._schedule = None
-        self._profile = list()
+        self._profile = None
+        self._engine_uid = None
 
         with open(cfg_path, 'r') as stream:
             cfg = load(stream)
@@ -29,7 +30,8 @@ class Executor(object):
         self._host = cfg['rmq']['host']
         self._port = cfg['rmq']['port']
         self._exchange = cfg['rmq']['executor']['exchange']
-        self._queue = cfg['rmq']['executor']['queues']['schedule']
+        self._queue_schedule = cfg['rmq']['executor']['queues']['schedule']
+        self._queue_cfg = cfg['rmq']['executor']['queues']['config']
         self._profile_loc = cfg['rmq']['executor']['profile_loc']
         self._logger.info('Configuration parsed')
 
@@ -40,8 +42,12 @@ class Executor(object):
         chan = conn.channel()
 
         chan.exchange_declare(exchange=self._exchange, exchange_type='direct')
-        chan.queue_declare(queue=self._queue)
-        chan.queue_bind(queue=self._queue, exchange=self._exchange, routing_key='schedule')
+
+        chan.queue_declare(queue=self._queue_schedule)
+        chan.queue_bind(queue=self._queue_schedule, exchange=self._exchange, routing_key='schedule')
+
+        chan.queue_declare(queue=self._queue_cfg)
+        chan.queue_bind(queue=self._queue_cfg, exchange=self._exchange, routing_key='cfg')
 
         self._logger.info('Messaging system established')
 
@@ -56,9 +62,24 @@ class Executor(object):
                 pika.ConnectionParameters(host=self._host, port=self._port))
             chan = conn.channel()
 
+            new_cfg = None
+            new_schedule = None
+
             while True:
 
-                method_frame, header_frame, schedule = chan.basic_get(queue=self._queue,
+                method_frame, header_frame, cfg = chan.basic_get(queue=self._queue_cfg,
+                                                                no_ack=True)
+                if cfg:
+
+                    tasks = list()
+                    cfg_as_dict = json.loads(cfg)
+                    if 'engine_uid' in cfg_as_dict.keys():
+                        self._engine_uid = cfg_as_dict['engine_uid']
+
+                    self._logger.info('Engine uid received')
+
+
+                method_frame, header_frame, schedule = chan.basic_get(queue=self._queue_schedule,
                                                                 no_ack=True)
                 if schedule:
 
@@ -75,7 +96,9 @@ class Executor(object):
 
                     self._logger.info('Schedule executed')
 
-                    self._record_profile(tasks)
+                if schedule and cfg:
+
+                    self._record_profile(tasks=tasks, engine_uid=self._engine_uid)
                     self._logger.info('Execution profile recorded')
 
 
@@ -96,7 +119,10 @@ class Executor(object):
             self._logger.exception('Executor failed with %s'%ex)
 
 
-    def _record_profile(self, tasks):
+    def _record_profile(self, tasks, engine_uid):
+
+        if engine_uid not in self._profile.keys():
+            self._profile[engine_uid] = list()
 
         for task in tasks:
             prof = {
@@ -106,7 +132,7 @@ class Executor(object):
                         'end_time': task.end_time,
                         'exec_time': task.end_time - task.start_time
                     }
-            self._profile.append(prof)
+            self._profile[engine_uid].append(prof)
 
     def _write_profile(self):
 
