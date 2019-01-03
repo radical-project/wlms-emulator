@@ -1,8 +1,8 @@
 # WLMS Calculator
 
 [![Build Status](https://travis-ci.com/vivek-bala/wlms_calculator.svg?token=LFpZhEFdwrpxHek4Duj6&branch=master)](https://travis-ci.com/vivek-bala/wlms_calculator)
-[![codecov]()]()
-[![Codacy Badge]()]()
+[![codecov](https://codecov.io/gh/vivek-bala/wlms_calculator/branch/master/graph/badge.svg?token=DDpa18UnYt)](https://codecov.io/gh/vivek-bala/wlms_calculator)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/4245c8add0a84796aa793234658eb351)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vivek-bala/wlms_calculator&amp;utm_campaign=Badge_Grade)
 
 This document discusses the installation and execution instructions
 for the WLMS calculator.
