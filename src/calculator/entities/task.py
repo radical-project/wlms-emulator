@@ -1,12 +1,13 @@
 import radical.utils as ru
 
+
 class Task(object):
 
     def __init__(self, ops=0, no_uid=False):
 
         self._uid = None
         if not no_uid:
-            self._uid = ru.generate_id('task',mode=ru.ID_PRIVATE)
+            self._uid = ru.generate_id('task', mode=ru.ID_PRIVATE)
 
         self._ops = ops
         self._start_time = None
@@ -56,12 +57,12 @@ class Task(object):
                 'start_time': self._start_time,
                 'end_time': self._end_time,
                 'exec_core': self._exec_core
-            }
+                }
 
     def from_dict(self, entry):
 
-        self._uid           = entry['uid']
-        self._ops           = entry['ops']
-        self._start_time    = entry['start_time']
-        self._end_time      = entry['end_time']
-        self._exec_core     = entry['exec_core']
+        self._uid = entry['uid']
+        self._ops = entry['ops']
+        self._start_time = entry['start_time']
+        self._end_time = entry['end_time']
+        self._exec_core = entry['exec_core']

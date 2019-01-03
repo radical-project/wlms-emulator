@@ -1,12 +1,11 @@
 import radical.utils as ru
 import numpy as np
 from ..entities.task import Task
-from ..exceptions import *
 
 
 class Workload(object):
 
-    def __init__(self, num_tasks=1, ops_dist='uniform', dist_mean=10, dist_var=0, no_uid=False):
+    def __init__(self, num_tasks=0, ops_dist='uniform', dist_mean=10, dist_var=0, no_uid=False):
 
         # Initialize
 
@@ -47,8 +46,7 @@ class Workload(object):
                                               high=self._dist_mean + self._dist_var,
                                               size=self._num_tasks)
         elif self._ops_dist == 'normal':
-            self._samples = [
-                self._dist_mean*np.random.randn()+self._dist_var for _ in range(self._num_tasks)]
+            self._samples = [self._dist_mean*np.random.randn()+self._dist_var for _ in range(self._num_tasks)]
 
         # Create N tasks with the selected samples
         self._task_list = [Task(self._samples[i])

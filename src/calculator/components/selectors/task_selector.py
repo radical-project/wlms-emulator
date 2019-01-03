@@ -1,8 +1,9 @@
 import radical.utils as ru
-from .algorithms.selection_algos import *
-from ..exceptions import *
+from ..algorithms.selection_algos import select_all
+from ...exceptions import CalcValueError
 
-class Selector(object):
+
+class Task_Selector(object):
 
     def __init__(self):
 
@@ -18,11 +19,16 @@ class Selector(object):
     def criteria(self, val):
         if val not in self._criteria_options:
             raise CalcValueError(obj=self._uid, attribute='criteria',
-                                expected_value=self._criteria_options,
-                                actual_value=val)
+                                 expected_value=self._criteria_options,
+                                 actual_value=val)
         self._criteria = val
 
     def select(self, collection, count):
+
+        if not self._criteria:
+            raise CalcValueError(obj=self._uid, attribute='criteria',
+                                 expected_value=self._criteria_options,
+                                 actual_value=None)
 
         if self._criteria == 'all':
             return select_all(collection, count)

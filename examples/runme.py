@@ -18,12 +18,16 @@ if __name__ == '__main__':
     res = Resource( num_cores=8,        # no.
                     perf_dist='uniform',# distribution to draw samples from
                     dist_mean=3,        # mean of distribution
-                    dist_var=1          # variance of distribution
+                    temporal_var=1,     # temporal variance of core performance
+                    spatial_var=0.5     # spatial variance of core performance
                 )
 
     # Create WLMS instance with a workload, resource, selection criteria, and
     # binding criteria
     eng = Engine(cfg_path='./config_baseline.yml')
 
-    # Run given workload on resources using the configured WLMS
-    eng.run(wl, res)
+    eng.assign_cfg()
+    eng.assign_resource(res)
+    eng.assign_workload(wl, submit_at=0)
+    eng.assign_workload(wl, submit_at=5)
+    eng.assign_workload(wl, submit_at=10)

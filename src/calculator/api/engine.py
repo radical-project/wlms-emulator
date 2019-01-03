@@ -1,10 +1,11 @@
 import radical.utils as ru
-from ..exceptions import *
+from ..exceptions import CalcTypeError
 from .resource import Resource
 from .workload import Workload
 from yaml import load
 import pika
 import json
+
 
 class Engine(object):
 
@@ -32,7 +33,7 @@ class Engine(object):
         if not isinstance(resource, Resource):
             raise CalcTypeError(expected_type=Resource,
                                 actual_type=type(resource)
-                            )
+                                )
 
         res_as_dict = resource.to_dict()
 
@@ -40,13 +41,12 @@ class Engine(object):
             pika.ConnectionParameters(host=self._host, port=self._port))
         chan = conn.channel()
 
-        chan.basic_publish( body=json.dumps(res_as_dict),
-                            exchange=self._wlms_exchange,
-                            routing_key='res'
-                        )
+        chan.basic_publish(body=json.dumps(res_as_dict),
+                           exchange=self._wlms_exchange,
+                           routing_key='res'
+                           )
 
         conn.close()
-
 
     def assign_cfg(self):
 
@@ -56,20 +56,19 @@ class Engine(object):
             pika.ConnectionParameters(host=self._host, port=self._port))
         chan = conn.channel()
 
-        chan.basic_publish( body=json.dumps(cfg_as_dict),
-                            exchange=self._executor_exchange,
-                            routing_key='cfg'
-                        )
+        chan.basic_publish(body=json.dumps(cfg_as_dict),
+                           exchange=self._executor_exchange,
+                           routing_key='cfg'
+                           )
 
         conn.close()
-
 
     def assign_workload(self, workload, submit_at):
 
         if not isinstance(workload, Workload):
             raise CalcTypeError(expected_type=Workload,
                                 actual_type=type(workload)
-                            )
+                                )
 
         wl_as_dict = workload.to_dict()
         wl_as_dict['submit_time'] = submit_at
@@ -78,9 +77,9 @@ class Engine(object):
             pika.ConnectionParameters(host=self._host, port=self._port))
         chan = conn.channel()
 
-        chan.basic_publish( body=json.dumps(wl_as_dict),
-                            exchange=self._wlms_exchange,
-                            routing_key='wl'
-                        )
+        chan.basic_publish(body=json.dumps(wl_as_dict),
+                           exchange=self._wlms_exchange,
+                           routing_key='wl'
+                           )
 
         conn.close()

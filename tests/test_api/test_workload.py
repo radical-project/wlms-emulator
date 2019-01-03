@@ -8,8 +8,8 @@ def test_workload_init():
 
     assert wl._uid.split('.')[0] == 'workload'
     assert wl._dist_options == ['uniform', 'normal']
-    assert isinstance(wl.task_list,list) and len(wl.task_list)==1
-    assert wl.num_tasks == 1
+    assert isinstance(wl.task_list,list) and len(wl.task_list)==0
+    assert wl.num_tasks == 0
     assert wl._ops_dist == 'uniform'
     assert wl._dist_mean == 10
     assert wl._dist_var == 0
@@ -25,7 +25,7 @@ def test_workload_create():
         assert isinstance(t, Task)
 
 def test_workload_reset():
-    wl = Workload()
+    wl = Workload(num_tasks=1)
     wl._task_list[0].start_time = 100
     wl._task_list[0].end_time = 120
     wl._task_list[0].exec_core = 'core.0000'
@@ -74,7 +74,7 @@ def test_workload_to_dict():
 
     assert tmp_list == tmp['task_list']
 
-def test_resource_from_dict():
+def test_workload_from_dict():
 
     tmp = {
             'uid': 'resource.1234',

@@ -1,6 +1,5 @@
 import radical.utils as ru
-from .task import Task
-from ..exceptions import *
+
 
 class Core(object):
 
@@ -8,7 +7,7 @@ class Core(object):
 
         self._uid = None
         if not no_uid:
-            self._uid = ru.generate_id('core',mode=ru.ID_PRIVATE)
+            self._uid = ru.generate_id('core', mode=ru.ID_PRIVATE)
         self._perf = perf
         self._util = list()
         self._task_history = list()
@@ -57,11 +56,11 @@ class Core(object):
                 'perf': self._perf,
                 'util': self._util,
                 'task_history': self._task_history
-            }
+                }
 
     def from_dict(self, entry):
 
-        self._uid           = entry['uid']
-        self._perf          = entry['perf']
-        self._util          = entry['util']
-        self._task_history  = entry['task_history']
+        self._uid = entry['uid']
+        self._perf = entry['perf']
+        self._util = entry['util']
+        self._task_history = entry['task_history']

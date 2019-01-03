@@ -1,13 +1,14 @@
 import radical.utils as ru
-from ..algorithms.binding_algos import *
-from ...exceptions import *
+from ..algorithms.binding_algos import round_robin, optimize_tte, optimize_util, random_placer
+from ...exceptions import CalcValueError
 
-class Binder(object):
+
+class Temporal_Binder(object):
 
     def __init__(self):
 
         self._uid = ru.generate_id('binder')
-        self._criteria_options = ['rr','tte', 'util','random']
+        self._criteria_options = ['rr', 'tte', 'util', 'random']
         self._criteria = None
         self._schedule = None
 
@@ -23,17 +24,17 @@ class Binder(object):
     def criteria(self, val):
         if val not in self._criteria_options:
             raise CalcValueError(obj=self._uid, attribute='criteria',
-                                expected_value=self._criteria_options,
-                                actual_value=val)
+                                 expected_value=self._criteria_options,
+                                 actual_value=val)
 
         self._criteria = val
 
-    def bind(self, workload, resource):
+    def bind(self, workload, resource, submit_time):
 
         if not self._criteria:
             raise CalcValueError(obj=self._uid, attribute='criteria',
-                                expected_value=self._criteria_options,
-                                actual_value=None)
+                                 expected_value=self._criteria_options,
+                                 actual_value=None)
 
         if self._criteria == 'rr':
             self._schedule = round_robin(workload, resource)

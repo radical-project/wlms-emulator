@@ -1,13 +1,15 @@
 import radical.utils as ru
-from ..components.selectors import Resource_Selector, Task_Selector
-from ..components.binders import Spatial_Binder, Temporal_Binder
-from ..components.executor import Executor
+from .selectors.core_selector import Core_Selector
+from .selectors.task_selector import Task_Selector
+from .binders.spatial_binder import Spatial_Binder
+from .binders.temporal_binder import Temporal_Binder
 from ..api.resource import Resource
 from ..api.workload import Workload
-from ..exceptions import *
 from yaml import load
 import pika
 import json
+from ..exceptions import CalcError
+
 
 class WLMS(object):
 
@@ -21,6 +23,9 @@ class WLMS(object):
         self._b_criteria = None
         self._host = None
         self._port = None
+
+        self._workload = None
+        self._resource = None
 
         with open(cfg_path, 'r') as stream:
             cfg = load(stream)
@@ -45,8 +50,8 @@ class WLMS(object):
 
         valid_ts_criteria = ['all']
         valid_rs_criteria = ['all']
-        valid_b_criteria = ['rr', 'tte', 'util','random']
-        print cfg
+        valid_b_criteria = ['rr', 'tte', 'util', 'random']
+
         task_selection_criteria = cfg['task_selector']
         resource_selection_criteria = cfg['resource_selector']
         binding_criteria = cfg['binder']
@@ -76,9 +81,12 @@ class WLMS(object):
         chan.queue_declare(queue=self._res_queue)
         chan.queue_declare(queue=self._cfg_queue)
 
-        chan.queue_bind(queue=self._wl_queue, exchange=self._exchange, routing_key='wl')
-        chan.queue_bind(queue=self._res_queue, exchange=self._exchange, routing_key='res')
-        chan.queue_bind(queue=self._cfg_queue, exchange=self._exchange, routing_key='cfg')
+        chan.queue_bind(queue=self._wl_queue,
+                        exchange=self._exchange, routing_key='wl')
+        chan.queue_bind(queue=self._res_queue,
+                        exchange=self._exchange, routing_key='res')
+        chan.queue_bind(queue=self._cfg_queue,
+                        exchange=self._exchange, routing_key='cfg')
 
         conn.close()
 
@@ -94,67 +102,79 @@ class WLMS(object):
                 pika.ConnectionParameters(host=self._host, port=self._port))
             chan = conn.channel()
 
-            workload, resource, submit_time = None, None, None
-
             while True:
 
                 method_frame, header_frame, wl = chan.basic_get(queue=self._wl_queue,
                                                                 no_ack=True)
-                if wl and not workload:
-                    workload = Workload(no_uid=True)
-                    workload.from_dict(json.loads(wl))
-                    submit_time = workload['submit_time']
-                    self._logger.info('Workload %s received'%workload.uid)
+                if wl and not self._workload:
+                    wl_as_dict = json.loads(wl)
+                    submit_time = wl_as_dict.pop('submit_time')
+
+                    self._workload = Workload(no_uid=True)
+                    self._workload.from_dict(wl_as_dict)
+                    self._logger.info('Workload %s received' %
+                                      self._workload.uid)
 
                 method_frame, header_frame, res = chan.basic_get(queue=self._res_queue,
                                                                  no_ack=True)
-                if res and not resource:
-                    resource = Resource(no_uid=True)
-                    resource.from_dict(json.loads(res))
-                    self._logger.info('Resource %s received'%resource.uid)
+                if res and not self._resource:
+                    self._resource = Resource(no_uid=True)
+                    self._resource.from_dict(json.loads(res))
+                    self._logger.info('Resource %s received' %
+                                      self._resource.uid)
 
-                if workload and resource:
+                if self._workload and self._resource:
 
-                    sel = Resource_Selector()
+                    self._resource.create_core_list()
+
+                    sel = Core_Selector()
                     sel.criteria = self._rs_criteria
-                    selected_cores = sel.select(collection=resource.core_list,
-                                                count=resource.num_cores,
-                                                submit_time=submit_time)
-                    self._logger.info('Resource selection complete')
+                    selected_cores = sel.select(collection=self._resource.core_list,
+                                                count=self._resource.num_cores)
 
                     if not selected_cores:
+                        self._logger.info(
+                            'No cores selected in resource selection phase')
                         continue
+
+                    self._logger.info('Resource selection complete')
 
                     sel = Task_Selector()
                     sel.criteria = self._ts_criteria
-                    selected_tasks = sel.select(collection=workload.task_list,
-                                                count=workload.num_tasks)
-                    self._logger.info('Task selection complete')
+                    selected_tasks = sel.select(collection=self._workload.task_list,
+                                                count=self._workload.num_tasks)
 
                     if not selected_tasks:
+                        self._logger.info(
+                            'No tasks selected in task selection phase')
                         continue
 
-                    for task in selected_tasks:
-                        if 
+                    self._logger.info('Task selection complete')
 
                     sb = Spatial_Binder()
                     sb.criteria = self._b_criteria
-                    schedule = m.bind(  workload=selected_tasks, 
-                                        resource=selected_cores)
-                    self._logger.info('Spatial Binding complete')
+                    schedule = sb.bind(workload=selected_tasks,
+                                       resource=selected_cores)
 
                     if not schedule:
+                        self._logger.info(
+                            'No spatial schedule created by current binding cfg')
                         continue
+
+                    self._logger.info('Spatial Binding complete')
 
                     tb = Temporal_Binder()
                     tb.criteria = self._b_criteria
-                    schedule = m.bind(  workload=selected_tasks,
-                                        resource=selected_cores,
-                                        submit_time=submit_time)
-                    self._logger.info('Temporal Binding complete')
+                    schedule = tb.bind(workload=selected_tasks,
+                                       resource=selected_cores,
+                                       submit_time=submit_time)
 
                     if not schedule:
+                        self._logger.info(
+                            'No temporal schedule created by current binding cfg')
                         continue
+
+                    self._logger.info('Temporal Binding complete')
 
                     schedule_as_dict = list()
                     for s in schedule:
@@ -169,7 +189,7 @@ class WLMS(object):
 
                     self._logger.info('Schedule published to executor')
 
-                    workload, resource = None, None
+                    self._workload = None
 
                 method_frame, header_frame, cfg = chan.basic_get(queue=self._cfg_queue,
                                                                  no_ack=True)
@@ -177,19 +197,16 @@ class WLMS(object):
                     self._logger.info('Reassigning criteria')
                     self._set_criteria(cfg)
 
-
-
         except KeyboardInterrupt:
 
             if conn:
                 conn.close()
 
-            self._logger.info('Closing %s'%self._uid)
-
+            self._logger.info('Closing %s' % self._uid)
 
         except Exception as ex:
 
             if conn:
                 conn.close()
 
-            self._logger.exception('WLMS failed with %s'%ex)
+            self._logger.exception('WLMS failed with %s' % ex)
