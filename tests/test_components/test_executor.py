@@ -69,6 +69,7 @@ def test_executor_record_profile():
         output.append({
                         'task': task.uid,
                         'core': task.exec_core,
+                        'ops': task.ops,
                         'start_time': task.start_time,
                         'end_time': task.end_time,
                         'exec_time': task.end_time - task.start_time
@@ -102,6 +103,7 @@ def test_executor_write_profile():
 
         output.append({
                         'task': task.uid,
+                        'ops': task.ops,
                         'core': task.exec_core,
                         'start_time': task.start_time,
                         'end_time': task.end_time,
