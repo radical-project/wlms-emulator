@@ -8,9 +8,9 @@ os:
   - linux
 
 #env variables
-env:
-  global:
-  - CODECOV_TOKEN="790b223f-07e4-4707-bb97-3abe58e29cd8"
+# env:
+#   global:
+#   - CODECOV_TOKEN="790b223f-07e4-4707-bb97-3abe58e29cd8"
 
 # command to install dependencies
 install:
@@ -24,13 +24,15 @@ before_script:
   - cat .coveragerc
 
 script:
-  - coverage run -m pytest -vvv tests/
+  - coverage run -m pytest -vvv tests/test_api/
+  - coverage run -m pytest -vvv tests/test_components/
+  - coverage run -m pytest -vvv tests/test_entities/
 
 after_success:
   - coverage combine
   - coverage xml
-  - codecov
-  - curl -s https://codecov.io/bash | bash
+  # - codecov
+  # - curl -s https://codecov.io/bash | bash
 
 services:
 - rabbitmq
