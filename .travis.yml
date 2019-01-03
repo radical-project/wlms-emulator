@@ -8,9 +8,9 @@ os:
   - linux
 
 #env variables
-# env:
-#   global:
-#   - CODECOV_TOKEN="790b223f-07e4-4707-bb97-3abe58e29cd8"
+env:
+  global:
+  - CODECOV_TOKEN="c78a5d49-2eb3-4844-ab1c-a009e9162f4e"
 
 # command to install dependencies
 install:
@@ -31,8 +31,8 @@ script:
 after_success:
   - coverage combine
   - coverage xml
-  # - codecov
-  # - curl -s https://codecov.io/bash | bash
+  - codecov
+  - curl -s https://codecov.io/bash | bash
 
-services:
-- rabbitmq
+# services:
+# - rabbitmq

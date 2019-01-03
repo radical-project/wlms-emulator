@@ -1,6 +1,6 @@
 # WLMS Calculator
 
-[![Build Status]()]()
+[![Build Status](https://travis-ci.com/vivek-bala/wlms_calculator.svg?token=LFpZhEFdwrpxHek4Duj6&branch=master)](https://travis-ci.com/vivek-bala/wlms_calculator)
 [![codecov]()]()
 [![Codacy Badge]()]()
 
