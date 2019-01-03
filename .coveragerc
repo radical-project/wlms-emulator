@@ -2,4 +2,4 @@
 [run]
 concurrency = multiprocessing
 parallel = True
-source = source = VENV/lib/python2.7/site-packages/calculator
+source = VENV/lib/python2.7/site-packages/calculator
