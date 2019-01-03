@@ -2,4 +2,4 @@
 [run]
 concurrency = multiprocessing
 parallel = True
-source = /home/vivek/Research/tools/miniconda2/envs/calc/lib/python2.7/site-packages/calculator
+source = source = VENV/lib/python2.7/site-packages/calculator

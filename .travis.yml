@@ -1,0 +1,36 @@
+language: python
+python: "2.7.13"
+
+branches:
+  - master
+
+os:
+  - linux
+
+#env variables
+env:
+  global:
+  - CODECOV_TOKEN="790b223f-07e4-4707-bb97-3abe58e29cd8"
+
+# command to install dependencies
+install:
+  - pip install .
+  - pip install coverage
+  - pip install codecov
+
+before_script:
+  - LOC=/home/travis/virtualenv/python2.7.13  # Location where VE is created on travis
+  - sed -i 's|VENV|'"$LOC"'|g' .coveragerc  # Update source in coveragerc
+  - cat .coveragerc
+
+script:
+  - coverage run -m pytest -vvv tests/
+
+after_success:
+  - coverage combine
+  - coverage xml
+  - codecov
+  - curl -s https://codecov.io/bash | bash
+
+services:
+- rabbitmq

@@ -1,5 +1,9 @@
 # WLMS Calculator
 
+[![Build Status]()]()
+[![codecov]()]()
+[![Codacy Badge]()]()
+
 This document discusses the installation and execution instructions
 for the WLMS calculator.
 
