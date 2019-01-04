@@ -7,19 +7,19 @@ if __name__ == '__main__':
 
     # Create a workload with a specific number of tasks with number of
     # operations per task drawn from a distribution
-    wl = Workload(  num_tasks=8,        # no. of tasks
-                    ops_dist='uniform', # distribution to draw samples from
-                    dist_mean=10,       # mean of distribution
-                    dist_var=4          # variance of distribution
+    wl = Workload(  num_tasks=128,          # no. of tasks
+                    ops_dist='uniform',     # distribution to draw samples from
+                    dist_mean=1024,         # mean of distribution
+                    dist_var=4              # variance of distribution
                 )
 
     # Create a resource with a specific number of cores with performance of each
     # core drawn from a distribution
-    res = Resource( num_cores=8,        # no.
+    res = Resource( num_cores=128,        # no.
                     perf_dist='uniform',# distribution to draw samples from
-                    dist_mean=3,        # mean of distribution
-                    temporal_var=1,     # temporal variance of core performance
-                    spatial_var=0.5     # spatial variance of core performance
+                    dist_mean=32,        # mean of distribution
+                    temporal_var=4,     # temporal variance of core performance
+                    spatial_var=8     # spatial variance of core performance
                 )
 
     # Create WLMS instance with a workload, resource, selection criteria, and
@@ -31,3 +31,9 @@ if __name__ == '__main__':
     eng.assign_workload(wl, submit_at=0)
     eng.assign_workload(wl, submit_at=5)
     eng.assign_workload(wl, submit_at=10)
+    eng.assign_workload(wl, submit_at=15)
+    eng.assign_workload(wl, submit_at=20)
+    eng.assign_workload(wl, submit_at=25)
+    eng.assign_workload(wl, submit_at=30)
+    eng.assign_workload(wl, submit_at=35)
+    

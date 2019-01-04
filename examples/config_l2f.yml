@@ -18,6 +18,13 @@ criteria:
   resource_selector: 'all'  # Criteria to be used by the resource selector
   binder: 'tte'             # Criteria to be used by the binder
 
+wlms:
+  primitive_order:
+    - task_selection
+    - resource_selection
+    - spatial_binding
+    - temporal_binding
+
 # RabbitMQ parameters, should not be changed by the user.
 rmq:
   host: 'two.radical-project.org'   # Hostname of the RMQ server
@@ -37,4 +44,5 @@ rmq:
     exchange: 'executor'
     queues:
       schedule: 'schedule'
+      config: 'cfg'
     profile_loc: './profile.json'
