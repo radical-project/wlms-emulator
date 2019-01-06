@@ -36,6 +36,10 @@ class Core(object):
     def util(self, val):
         self._util = val
 
+    @task_history.setter
+    def task_history(self, val):
+        self._task_history = val
+
     def execute(self, task):
 
         dur = task.ops / self._perf

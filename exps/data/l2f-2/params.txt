@@ -1,0 +1,12 @@
+wl = Workload(  num_tasks=128,              # no. of tasks
+                    ops_dist='uniform',     # distribution to draw samples from
+                    dist_mean=1024,         # mean of distribution
+                    dist_var=4              # variance of distribution
+                )
+
+res = Resource( num_cores=128,          # no.
+                perf_dist='uniform',    # distribution to draw samples from
+                dist_mean=32,           # mean of distribution
+                temporal_var=4,         # temporal variance of core performance
+                spatial_var=8           # spatial variance of core performance
+            )

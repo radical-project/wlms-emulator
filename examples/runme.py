@@ -2,8 +2,9 @@ from calculator import Workload
 from calculator import Resource
 from calculator import Engine
 from pprint import pprint
+import yaml
 
-if __name__ == '__main__':
+def get_workload():
 
     # Create a workload with a specific number of tasks with number of
     # operations per task drawn from a distribution
@@ -13,13 +14,18 @@ if __name__ == '__main__':
                     dist_var=4              # variance of distribution
                 )
 
+    return wl
+
+
+if __name__ == '__main__':
+
     # Create a resource with a specific number of cores with performance of each
     # core drawn from a distribution
     res = Resource( num_cores=128,        # no.
                     perf_dist='uniform',# distribution to draw samples from
                     dist_mean=32,        # mean of distribution
-                    temporal_var=4,     # temporal variance of core performance
-                    spatial_var=8     # spatial variance of core performance
+                    temporal_var=1,     # temporal variance of core performance
+                    spatial_var=1     # spatial variance of core performance
                 )
 
     # Create WLMS instance with a workload, resource, selection criteria, and
@@ -28,12 +34,28 @@ if __name__ == '__main__':
 
     eng.assign_cfg()
     eng.assign_resource(res)
+
+    wl = get_workload()
     eng.assign_workload(wl, submit_at=0)
+
+    wl = get_workload()
     eng.assign_workload(wl, submit_at=5)
+
+    wl = get_workload()
     eng.assign_workload(wl, submit_at=10)
+
+    wl = get_workload()
     eng.assign_workload(wl, submit_at=15)
+
+    wl = get_workload()
     eng.assign_workload(wl, submit_at=20)
+
+    wl = get_workload()
     eng.assign_workload(wl, submit_at=25)
+
+    wl = get_workload()
     eng.assign_workload(wl, submit_at=30)
+
+    wl = get_workload()
     eng.assign_workload(wl, submit_at=35)
     

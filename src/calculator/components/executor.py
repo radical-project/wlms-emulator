@@ -29,6 +29,7 @@ class Executor(object):
         self._host = cfg['rmq']['host']
         self._port = cfg['rmq']['port']
         self._exchange = cfg['rmq']['executor']['exchange']
+        self._wlms_exchange = cfg['rmq']['wlms']['exchange']
         self._queue_schedule = cfg['rmq']['executor']['queues']['schedule']
         self._queue_cfg = cfg['rmq']['executor']['queues']['config']
         self._profile_loc = cfg['rmq']['executor']['profile_loc']
@@ -85,14 +86,27 @@ class Executor(object):
 
                     tasks = list()
                     schedule_as_dict = json.loads(schedule)
+                    cores_as_dict = dict()
 
                     for s in schedule_as_dict:
                         task = Task(no_uid=True)
                         task.from_dict(s['task'])
-                        core = Core(no_uid=True)
-                        core.from_dict(s['core'])
+
+                        if s['core']['uid'] not in cores_as_dict.keys():
+                            core = Core(no_uid=True)
+                            core.from_dict(s['core'])
+                            cores_as_dict[s['core']['uid']] = core
+                        else:
+                            core = cores_as_dict[s['core']['uid']]
+
                         core.execute(task)
                         tasks.append(task)
+                        
+                    cores_as_list = [core.to_dict() for core in cores_as_dict.values()]
+                    chan.basic_publish( exchange=self._wlms_exchange,
+                                        routing_key='exec',
+                                        body=json.dumps(cores_as_list)
+                                    )
 
                     self._logger.info('Schedule executed')
 

@@ -41,7 +41,7 @@ class WLMS(object):
         self._tgt_exchange = cfg['rmq']['executor']['exchange']
         self._wl_queue = cfg['rmq']['wlms']['queues']['workload']
         self._res_queue = cfg['rmq']['wlms']['queues']['resource']
-        self._cfg_queue = cfg['rmq']['wlms']['queues']['config']
+        self._exec_queue = cfg['rmq']['wlms']['queues']['executor']
 
         self._set_criteria(cfg['criteria'])
         self._logger.info('Configuration parsed')
@@ -79,14 +79,14 @@ class WLMS(object):
 
         chan.queue_declare(queue=self._wl_queue)
         chan.queue_declare(queue=self._res_queue)
-        chan.queue_declare(queue=self._cfg_queue)
+        chan.queue_declare(queue=self._exec_queue)
 
         chan.queue_bind(queue=self._wl_queue,
                         exchange=self._exchange, routing_key='wl')
         chan.queue_bind(queue=self._res_queue,
                         exchange=self._exchange, routing_key='res')
-        chan.queue_bind(queue=self._cfg_queue,
-                        exchange=self._exchange, routing_key='cfg')
+        chan.queue_bind(queue=self._exec_queue,
+                        exchange=self._exchange, routing_key='exec')
 
         conn.close()
 
@@ -190,12 +190,21 @@ class WLMS(object):
                     self._logger.info('Schedule published to executor')
 
                     self._workload = None
+                    cores = None
 
-                method_frame, header_frame, cfg = chan.basic_get(queue=self._cfg_queue,
-                                                                 no_ack=True)
-                if cfg:
-                    self._logger.info('Reassigning criteria')
-                    self._set_criteria(cfg)
+                    while not cores:
+                        method_frame, header_frame, cores = chan.basic_get(queue=self._exec_queue,
+                                                                        no_ack=True)
+
+                    self._logger.info('Received updates cores')
+                    cores_as_dict = json.loads(cores)
+                    for core in cores_as_dict:
+                        for c in selected_cores:
+                            if core['uid'] == c.uid:
+                                c.util = core['util']
+                                c.task_history = core['task_history']
+
+                    self._logger.info('Cores updated')
 
         except KeyboardInterrupt:
 

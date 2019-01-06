@@ -38,7 +38,7 @@ rmq:
     queues:
       workload: 'wl'
       resource: 'res'
-      config: 'cfg'
+      executor: 'exec'
 
   executor:
     exchange: 'executor'

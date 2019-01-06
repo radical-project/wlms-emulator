@@ -1,0 +1,68 @@
+{
+    "engine.2019.01.05.18.15.28.016804.0000": [
+        {
+            "core": "core.vivek-ThinkPad-X1-Carbon-6th.vivek.017901.0468", 
+            "end_time": 29.323822318166624, 
+            "exec_time": 29.323822318166624, 
+            "ops": 1039.2620322223272, 
+            "start_time": 0, 
+            "task": "task.vivek-ThinkPad-X1-Carbon-6th.vivek.017901.0458"
+        }, 
+        {
+            "core": "core.vivek-ThinkPad-X1-Carbon-6th.vivek.017901.0470", 
+            "end_time": 29.723014203299893, 
+            "exec_time": 29.723014203299893, 
+            "ops": 1031.5123658527582, 
+            "start_time": 0, 
+            "task": "task.vivek-ThinkPad-X1-Carbon-6th.vivek.017901.0459"
+        }, 
+        {
+            "core": "core.vivek-ThinkPad-X1-Carbon-6th.vivek.017901.0467", 
+            "end_time": 29.731451897964792, 
+            "exec_time": 29.731451897964792, 
+            "ops": 1031.4256321573569, 
+            "start_time": 0, 
+            "task": "task.vivek-ThinkPad-X1-Carbon-6th.vivek.017901.0461"
+        }, 
+        {
+            "core": "core.vivek-ThinkPad-X1-Carbon-6th.vivek.017901.0464", 
+            "end_time": 29.486788507222837, 
+            "exec_time": 29.486788507222837, 
+            "ops": 1016.3489875931657, 
+            "start_time": 0, 
+            "task": "task.vivek-ThinkPad-X1-Carbon-6th.vivek.017901.0457"
+        }, 
+        {
+            "core": "core.vivek-ThinkPad-X1-Carbon-6th.vivek.017901.0471", 
+            "end_time": 31.19959381671554, 
+            "exec_time": 31.19959381671554, 
+            "ops": 1015.273931085129, 
+            "start_time": 0, 
+            "task": "task.vivek-ThinkPad-X1-Carbon-6th.vivek.017901.0462"
+        }, 
+        {
+            "core": "core.vivek-ThinkPad-X1-Carbon-6th.vivek.017901.0466", 
+            "end_time": 31.304576228332202, 
+            "exec_time": 31.304576228332202, 
+            "ops": 1012.6906998859405, 
+            "start_time": 0, 
+            "task": "task.vivek-ThinkPad-X1-Carbon-6th.vivek.017901.0463"
+        }, 
+        {
+            "core": "core.vivek-ThinkPad-X1-Carbon-6th.vivek.017901.0465", 
+            "end_time": 31.779668457224716, 
+            "exec_time": 31.779668457224716, 
+            "ops": 1009.9844781314379, 
+            "start_time": 0, 
+            "task": "task.vivek-ThinkPad-X1-Carbon-6th.vivek.017901.0456"
+        }, 
+        {
+            "core": "core.vivek-ThinkPad-X1-Carbon-6th.vivek.017901.0469", 
+            "end_time": 31.88663607174599, 
+            "exec_time": 31.88663607174599, 
+            "ops": 1009.8443483533744, 
+            "start_time": 0, 
+            "task": "task.vivek-ThinkPad-X1-Carbon-6th.vivek.017901.0460"
+        }
+    ]
+}
