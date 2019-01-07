@@ -17,12 +17,16 @@ def test_wlms_init():
 
     fpath = os.path.dirname(os.path.abspath(__file__))
     wlms = WLMS(cfg_path='%s/../config_test.yml'%fpath)
+
+    with open('%s/../config_test.yml'%fpath) as fp:
+        cfg = yaml.load(fp)
+
     assert wlms._uid.split('.')[0] == 'wlms'
-    assert wlms._ts_criteria == 'all'
-    assert wlms._rs_criteria == 'all'
-    assert wlms._b_criteria == 'tte' 
-    assert wlms._host == 'two.radical-project.org'
-    assert wlms._port == 33251 
+    assert wlms._ts_criteria == cfg['criteria']['task_selector']
+    assert wlms._rs_criteria == cfg['criteria']['resource_selector']
+    assert wlms._b_criteria == cfg['criteria']['binder']
+    assert wlms._host == cfg['rmq']['host']
+    assert wlms._port == cfg['rmq']['port']
 
 
 def test_wlms_parse_cfg():
@@ -39,7 +43,7 @@ def test_wlms_parse_cfg():
     assert wlms._tgt_exchange == cfg['rmq']['executor']['exchange']
     assert wlms._wl_queue == cfg['rmq']['wlms']['queues']['workload']
     assert wlms._res_queue == cfg['rmq']['wlms']['queues']['resource']
-    assert wlms._cfg_queue == cfg['rmq']['wlms']['queues']['config']
+    assert wlms._exec_queue == cfg['rmq']['wlms']['queues']['executor']
 
 
 def test_wlms_set_criteria():

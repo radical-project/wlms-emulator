@@ -28,7 +28,7 @@ def test_executor_parse_cfg():
     cfg = {
             'rmq': {
                     'host': 'two.radical-project.org',
-                    'port': 33251,
+                    'port': 33202,
                     'executor': {
                                     'exchange': 'exch',
                                     'queues': {
@@ -40,8 +40,14 @@ def test_executor_parse_cfg():
                 }
         }
 
+    
+
     fpath = os.path.dirname(os.path.abspath(__file__))
-    executor = Executor(cfg_path='%s/../config_test.yml'%fpath)
+    cfg_path='%s/../config_test.yml'%fpath
+    with open(cfg_path, 'r') as stream:
+        cfg = yaml.load(stream)
+
+    executor = Executor(cfg_path=cfg_path)
     executor._parse_cfg(cfg)
 
     assert executor._host == cfg['rmq']['host']

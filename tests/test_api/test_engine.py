@@ -52,7 +52,7 @@ def func_setup_mqs(cfg, executor=False):
     chan.exchange_declare(exchange=cfg['rmq']['wlms']['exchange'], exchange_type='direct')
     chan.queue_declare(queue=cfg['rmq']['wlms']['queues']['workload'])
     chan.queue_declare(queue=cfg['rmq']['wlms']['queues']['resource'])
-    chan.queue_declare(queue=cfg['rmq']['wlms']['queues']['config'])
+    chan.queue_declare(queue=cfg['rmq']['wlms']['queues']['executor'])
 
     chan.queue_bind(queue=cfg['rmq']['wlms']['queues']['workload'],
                     exchange=cfg['rmq']['wlms']['exchange'], 
@@ -62,9 +62,9 @@ def func_setup_mqs(cfg, executor=False):
                     exchange=cfg['rmq']['wlms']['exchange'], 
                     routing_key='res')
 
-    chan.queue_bind(queue=cfg['rmq']['wlms']['queues']['config'],
+    chan.queue_bind(queue=cfg['rmq']['wlms']['queues']['executor'],
                     exchange=cfg['rmq']['wlms']['exchange'], 
-                    routing_key='cfg')
+                    routing_key='exec')
 
     return conn, chan
 
