@@ -21,7 +21,7 @@ criteria:
 # RabbitMQ parameters, should not be changed by the user.
 rmq:
   host: 'two.radical-project.org'   # Hostname of the RMQ server
-  port: 33251                       # Port of the RMQ server
+  port: 33202                       # Port of the RMQ server
 
 # Do not change unless you expect a conflict in the RMQ server There is a
 # conflict only if you have multiple concurrent instances of this wlms or
@@ -31,7 +31,7 @@ rmq:
     queues:
       workload: 'wl'
       resource: 'res'
-      config: 'cfg'
+      executor: 'exec'
 
   executor:
     exchange: 'executor'
