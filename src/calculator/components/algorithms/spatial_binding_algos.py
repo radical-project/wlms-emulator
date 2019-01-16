@@ -8,7 +8,7 @@ def round_robin(workload, resource):
     return m
 
 
-def optimize_tte(workload, resource):
+def largest_to_fastest(workload, resource):
 
     m = list()
 
@@ -21,18 +21,18 @@ def optimize_tte(workload, resource):
 
     return m
 
-
-def optimize_util(workload, resource):
+def smallest_to_fastest(workload, resource):
 
     m = list()
+
+    workload = sorted(workload, key=lambda task: task.ops)
     resource = sorted(resource, key=lambda unit: unit.perf, reverse=True)
 
-    for task in workload:
+    for idx, task in enumerate(workload):
         m.append({'task': task,
-                  'core': resource[0]})
+                  'core': resource[idx % len(resource)]})
 
     return m
-
 
 def random_placer(workload, resource):
 

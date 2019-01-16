@@ -16,7 +16,16 @@
 criteria:
   task_selector: 'all'      # Criteria to be used by the task selector
   resource_selector: 'all'  # Criteria to be used by the resource selector
-  binder: 'tte'             # Criteria to be used by the binder
+  spatial_binder: 'l2f'     # Criteria to be used by the spatial binder
+  temporal_binder: 'ff'     # Criteria to be used by the temporal binder
+
+wlms:
+  primitive_order:
+    - task_selection
+    - resource_selection
+    - spatial_binding
+    - temporal_binding
+
 
 # RabbitMQ parameters, should not be changed by the user.
 rmq:

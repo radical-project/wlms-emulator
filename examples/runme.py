@@ -38,24 +38,24 @@ if __name__ == '__main__':
     wl = get_workload()
     eng.assign_workload(wl, submit_at=0)
 
-    wl = get_workload()
-    eng.assign_workload(wl, submit_at=5)
+    # wl = get_workload()
+    # eng.assign_workload(wl, submit_at=5)
 
-    wl = get_workload()
-    eng.assign_workload(wl, submit_at=10)
+    # wl = get_workload()
+    # eng.assign_workload(wl, submit_at=10)
 
-    wl = get_workload()
-    eng.assign_workload(wl, submit_at=15)
+    # wl = get_workload()
+    # eng.assign_workload(wl, submit_at=15)
 
-    wl = get_workload()
-    eng.assign_workload(wl, submit_at=20)
+    # wl = get_workload()
+    # eng.assign_workload(wl, submit_at=20)
 
-    wl = get_workload()
-    eng.assign_workload(wl, submit_at=25)
+    # wl = get_workload()
+    # eng.assign_workload(wl, submit_at=25)
 
-    wl = get_workload()
-    eng.assign_workload(wl, submit_at=30)
+    # wl = get_workload()
+    # eng.assign_workload(wl, submit_at=30)
 
-    wl = get_workload()
-    eng.assign_workload(wl, submit_at=35)
+    # wl = get_workload()
+    # eng.assign_workload(wl, submit_at=35)
     

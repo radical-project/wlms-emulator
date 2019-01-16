@@ -1,5 +1,5 @@
 import radical.utils as ru
-from ..algorithms.binding_algos import round_robin, optimize_tte, optimize_util, random_placer
+from ..algorithms.temporal_binding_algos import fastest_first, slowest_first, random_order
 from ...exceptions import CalcValueError
 
 
@@ -8,13 +8,9 @@ class Temporal_Binder(object):
     def __init__(self):
 
         self._uid = ru.generate_id('binder')
-        self._criteria_options = ['rr', 'tte', 'util', 'random']
+        self._criteria_options = ['ff', 'sf', 'random']
         self._criteria = None
         self._schedule = None
-
-    @property
-    def schedule(self):
-        return self._schedule
 
     @property
     def criteria(self):
@@ -29,23 +25,20 @@ class Temporal_Binder(object):
 
         self._criteria = val
 
-    def bind(self, workload, resource, submit_time):
+    def bind(self, workload):
 
         if not self._criteria:
             raise CalcValueError(obj=self._uid, attribute='criteria',
                                  expected_value=self._criteria_options,
                                  actual_value=None)
 
-        if self._criteria == 'rr':
-            self._schedule = round_robin(workload, resource)
+        if self._criteria == 'ff':
+            self._schedule = fastest_first(workload)
 
-        elif self._criteria == 'tte':
-            self._schedule = optimize_tte(workload, resource)
-
-        elif self._criteria == 'util':
-            self._schedule = optimize_util(workload, resource)
+        elif self._criteria == 'sf':
+            self._schedule = slowest_first(workload)
 
         elif self._criteria == 'random':
-            self._schedule = random_placer(workload, resource)
+            self._schedule = random_order(workload)
 
         return self._schedule

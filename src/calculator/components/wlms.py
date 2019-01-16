@@ -20,7 +20,8 @@ class WLMS(object):
         self._logger = ru.Logger('radical.wlms.%s' % self._uid)
         self._ts_criteria = None
         self._rs_criteria = None
-        self._b_criteria = None
+        self._sb_criteria = None
+        self._tb_criteria = None
         self._host = None
         self._port = None
 
@@ -50,22 +51,27 @@ class WLMS(object):
 
         valid_ts_criteria = ['all']
         valid_rs_criteria = ['all']
-        valid_b_criteria = ['rr', 'tte', 'util', 'random']
+        valid_sb_criteria = ['rr', 'l2f', 's2f', 'random']
+        valid_tb_criteria = ['ff', 'sf', 'random']
 
         task_selection_criteria = cfg['task_selector']
         resource_selection_criteria = cfg['resource_selector']
-        binding_criteria = cfg['binder']
+        spatial_binding_criteria = cfg['spatial_binder']
+        tempora_binding_criteria = cfg['temporal_binder']
 
         if task_selection_criteria not in valid_ts_criteria or \
                 resource_selection_criteria not in valid_rs_criteria or \
-                binding_criteria not in valid_b_criteria:
-            raise CalcError('%s, %s, or %s is invalid' % (task_selection_criteria,
-                                                          resource_selection_criteria,
-                                                          binding_criteria))
+                spatial_binding_criteria not in valid_sb_criteria or \
+                tempora_binding_criteria not in valid_tb_criteria:
+            raise CalcError('%s, %s, %s, or %s is invalid' % (task_selection_criteria,
+                                                            resource_selection_criteria,
+                                                            spatial_binding_criteria,
+                                                            tempora_binding_criteria))
 
         self._ts_criteria = task_selection_criteria
         self._rs_criteria = resource_selection_criteria
-        self._b_criteria = binding_criteria
+        self._sb_criteria = spatial_binding_criteria
+        self._tb_criteria = tempora_binding_criteria
 
         self._logger.info('Criteria assigned')
 
@@ -101,6 +107,19 @@ class WLMS(object):
             conn = pika.BlockingConnection(
                 pika.ConnectionParameters(host=self._host, port=self._port))
             chan = conn.channel()
+
+            def create_schedule(s_mapping, t_mapping):
+
+                schedule = list()
+                for t1 in t_mapping:
+                    for item in s_mapping:
+                        if t1.uid == item['task'].uid:
+                            schedule.append(item)
+
+
+                return schedule
+
+
 
             while True:
 
@@ -152,29 +171,29 @@ class WLMS(object):
                     self._logger.info('Task selection complete')
 
                     sb = Spatial_Binder()
-                    sb.criteria = self._b_criteria
-                    schedule = sb.bind(workload=selected_tasks,
+                    sb.criteria = self._sb_criteria
+                    s_mapping = sb.bind(workload=selected_tasks,
                                        resource=selected_cores)
 
-                    if not schedule:
+                    if not s_mapping:
                         self._logger.info(
-                            'No spatial schedule created by current binding cfg')
+                            'No spatial mapping created by current binding cfg')
                         continue
 
                     self._logger.info('Spatial Binding complete')
 
                     tb = Temporal_Binder()
-                    tb.criteria = self._b_criteria
-                    schedule = tb.bind(workload=selected_tasks,
-                                       resource=selected_cores,
-                                       submit_time=submit_time)
+                    tb.criteria = self._tb_criteria
+                    t_mapping = tb.bind(workload=selected_tasks)
 
-                    if not schedule:
+                    if not t_mapping:
                         self._logger.info(
-                            'No temporal schedule created by current binding cfg')
+                            'No temporal mapping created by current binding cfg')
                         continue
 
                     self._logger.info('Temporal Binding complete')
+
+                    schedule = create_schedule(s_mapping, t_mapping)
 
                     schedule_as_dict = list()
                     for s in schedule:

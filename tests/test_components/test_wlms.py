@@ -24,7 +24,8 @@ def test_wlms_init():
     assert wlms._uid.split('.')[0] == 'wlms'
     assert wlms._ts_criteria == cfg['criteria']['task_selector']
     assert wlms._rs_criteria == cfg['criteria']['resource_selector']
-    assert wlms._b_criteria == cfg['criteria']['binder']
+    assert wlms._sb_criteria == cfg['criteria']['spatial_binder']
+    assert wlms._tb_criteria == cfg['criteria']['temporal_binder']
     assert wlms._host == cfg['rmq']['host']
     assert wlms._port == cfg['rmq']['port']
 
@@ -57,7 +58,8 @@ def test_wlms_set_criteria():
 
     assert wlms._ts_criteria == cfg['criteria']['task_selector']
     assert wlms._rs_criteria == cfg['criteria']['resource_selector']
-    assert wlms._b_criteria == cfg['criteria']['binder']
+    assert wlms._sb_criteria == cfg['criteria']['spatial_binder']
+    assert wlms._tb_criteria == cfg['criteria']['temporal_binder']
 
 
 def func_for_test_wlms_run(wlms):
