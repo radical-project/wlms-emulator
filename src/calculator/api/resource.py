@@ -88,7 +88,7 @@ class Resource(object):
         if not self._core_list:
             self._core_list = [Core(samples[i])
                                for i in range(self._num_cores)]
-        else:
+        elif self._temp_var:
             for ind, core in enumerate(self._core_list):
                 core.perf = samples[ind]
 

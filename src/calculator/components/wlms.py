@@ -116,10 +116,7 @@ class WLMS(object):
                         if t1.uid == item['task'].uid:
                             schedule.append(item)
 
-
                 return schedule
-
-
 
             while True:
 
@@ -136,7 +133,7 @@ class WLMS(object):
 
                 method_frame, header_frame, res = chan.basic_get(queue=self._res_queue,
                                                                  no_ack=True)
-                if res and not self._resource:
+                if res:
                     self._resource = Resource(no_uid=True)
                     self._resource.from_dict(json.loads(res))
                     self._logger.info('Resource %s received' %
@@ -195,7 +192,7 @@ class WLMS(object):
 
                     schedule = create_schedule(s_mapping, t_mapping)
 
-                    schedule_as_dict = list()
+                    schedule_as_dict = list()                    
                     for s in schedule:
                         task_as_dict = s['task'].to_dict()
                         core_as_dict = s['core'].to_dict()
