@@ -75,22 +75,29 @@ class Resource(object):
         if self._perf_dist == 'uniform':
             spatial_mean = np.random.uniform(low=self._dist_mean - self._temp_var,
                                              high=self._dist_mean + self._temp_var,
-                                             size=1)
-            samples = np.random.uniform(low=spatial_mean - self._spat_var,
+                                             size=1)[0]
+            samples = list(np.random.uniform(low=spatial_mean - self._spat_var,
                                         high=spatial_mean + self._spat_var,
-                                        size=self._num_cores)
+                                        size=self._num_cores))
         elif self._perf_dist == 'normal':
-            spatial_mean = self._dist_mean*np.random.randn()+self._temp_var
-            samples = [spatial_mean*np.random.randn() +
-                       self._spat_var for _ in range(self._num_cores)]
+            if self._temp_var:
+                spatial_mean = np.random.normal(self._dist_mean,self._temp_var,1)[0]
+            else:
+                spatial_mean = self._dist_mean
+
+            if self._spat_var:
+                samples = list(np.random.normal(spatial_mean, self._spat_var, self._num_cores))
+            else:
+                samples = [spatial_mean for _ in range(self._num_cores)]
+            
 
         # Create N execution units with the selected samples
         if not self._core_list:
-            self._core_list = [Core(samples[i])
+            self._core_list = [Core(abs(samples[i]))
                                for i in range(self._num_cores)]
         elif self._temp_var:
             for ind, core in enumerate(self._core_list):
-                core.perf = samples[ind]
+                core.perf = abs(samples[ind])
 
     def to_dict(self):
 

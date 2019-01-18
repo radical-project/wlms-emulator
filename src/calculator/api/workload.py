@@ -42,11 +42,14 @@ class Workload(object):
 
         # Select N samples from the selected distribution
         if self._ops_dist == 'uniform':
-            self._samples = np.random.uniform(low=self._dist_mean - self._dist_var,
+            self._samples = list(np.random.uniform(low=self._dist_mean - self._dist_var,
                                               high=self._dist_mean + self._dist_var,
-                                              size=self._num_tasks)
+                                              size=self._num_tasks))
         elif self._ops_dist == 'normal':
-            self._samples = [self._dist_mean*np.random.randn()+self._dist_var for _ in range(self._num_tasks)]
+            if self._dist_var:
+                self._samples = list(np.random.normal(self._dist_mean, self._dist_var, self._num_tasks))
+            else:
+                self._samples = [self._dist_mean for _ in range(self._num_tasks)]
 
         # Create N tasks with the selected samples
         self._task_list = [Task(self._samples[i])
