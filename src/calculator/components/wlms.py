@@ -27,6 +27,7 @@ class WLMS(object):
 
         self._workload = None
         self._resource = None
+        self._early_binding = None
 
         with open(cfg_path, 'r') as stream:
             cfg = load(stream)
@@ -43,6 +44,7 @@ class WLMS(object):
         self._wl_queue = cfg['rmq']['wlms']['queues']['workload']
         self._res_queue = cfg['rmq']['wlms']['queues']['resource']
         self._exec_queue = cfg['rmq']['wlms']['queues']['executor']
+        self._early_binding = cfg['wlms'].get('early_binding', False)
 
         self._set_criteria(cfg['criteria'])
         self._logger.info('Configuration parsed')
@@ -118,6 +120,8 @@ class WLMS(object):
 
                 return schedule
 
+            resource_visited = list()
+
             while True:
 
                 method_frame, header_frame, wl = chan.basic_get(queue=self._wl_queue,
@@ -141,7 +145,11 @@ class WLMS(object):
 
                 if self._workload and self._resource:
 
-                    self._resource.create_core_list()
+                    if not self._early_binding or (self._resource.uid not in resource_visited):
+                        self._resource.create_core_list()
+                        self._logger.info("Resource core list created")
+                        if self._resource.uid not in resource_visited:
+                            resource_visited.append(self._resource.uid)
 
                     sel = Core_Selector()
                     sel.criteria = self._rs_criteria

@@ -42,7 +42,7 @@ class Spatial_Binder(object):
         elif self._criteria == 'l2f':
             self._schedule = largest_to_fastest(workload, resource)
 
-        elif self._criteria == 'us2f':
+        elif self._criteria == 's2f':
             self._schedule = smallest_to_fastest(workload, resource)
 
         elif self._criteria == 'random':
