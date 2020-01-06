@@ -81,27 +81,20 @@ class Resource(object):
         # performance varies over time, then each resource's performance needs
         # to be updated based on a distirution and on different moments in time.
         if self._perf_dist == 'uniform':
-            spatial_mean = np.random.uniform(low=self._dist_mean - self._temp_var,
-                                             high=self._dist_mean + self._temp_var,
-                                             size=1)[0]
-            samples = list(np.random.uniform(low=spatial_mean - self._spat_var,
-                                        high=spatial_mean + self._spat_var,
+            samples = list(np.random.uniform(low=self._dist_mean - self._spat_var,
+                                        high=self._dist_mean + self._spat_var,
                                         size=self._num_cores))
         elif self._perf_dist == 'normal':
-            if self._temp_var:
-                spatial_mean = np.random.normal(self._dist_mean,self._temp_var,1)[0]
-            else:
-                spatial_mean = self._dist_mean
-
-            if self._spat_var:
-                samples = list(np.random.normal(spatial_mean, self._spat_var, self._num_cores))
-            else:
-                samples = [spatial_mean for _ in range(self._num_cores)]
-            
+            samples = list(np.random.normal(self._dist_mean, self._spat_var,
+                                            self._num_cores))
+    
 
         # Create N execution units with the selected samples
+        # some sample in the non uniform distribution might be negative. Those
+        # samples should be discarded or folded around 0?
         if not self._core_list:
-            self._core_list = [Core(abs(samples[i]))
+            self._core_list = [Core(abs(samples[i]), distribution=self._perf_dist,
+                                    var=self._temp_var)
                                for i in range(self._num_cores)]
         elif self._temp_var:
             for ind, core in enumerate(self._core_list):
