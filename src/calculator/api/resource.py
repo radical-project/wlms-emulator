@@ -71,7 +71,15 @@ class Resource(object):
 
     def create_core_list(self):
 
-        # Select N samples from the selected distribution
+        # Select N samples from the selected distribution. Currently the code
+        # creates a set of samples based on the temporal variance on the temporal
+        # variance. These samples are then used as means to get the set of cores
+        # used for the emulation.
+
+        # FIXME: Based on spatial mean, a spatial variance and a distribution, a
+        # set of resources is created. If these resources are dynamic and their 
+        # performance varies over time, then each resource's performance needs
+        # to be updated based on a distirution and on different moments in time.
         if self._perf_dist == 'uniform':
             spatial_mean = np.random.uniform(low=self._dist_mean - self._temp_var,
                                              high=self._dist_mean + self._temp_var,
