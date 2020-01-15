@@ -19,9 +19,9 @@ except ImportError as e:
 
 # -----------------------------------------------------------------------------
 #
-if sys.hexversion < 0x02060000 or sys.hexversion >= 0x03000000:
+if sys.hexversion < 0x03050000:
     raise RuntimeError(
-        "SETUP ERROR: radical.entk requires Python 2.6 or higher")
+        "SETUP ERROR: radical.calculator requires Python 3.5 or higher")
 
 # short_version = 0.6
 
@@ -43,10 +43,10 @@ setup_args = {
         'Environment :: Console',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.5',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Utilities',
         'Topic :: System :: Distributed Computing',
         'Operating System :: MacOS :: MacOS X',
@@ -60,7 +60,7 @@ setup_args = {
     'packages': find_packages('src'),
     'package_dir': {'': 'src'},
     'package_data':  {'': ['*.sh', '*.json', 'VERSION', 'SDIST']},
-    'install_requires':  ['radical.utils', 'numpy', 'pytest', 'pyyaml',
+    'install_requires':  ['radical.utils==1.0.0', 'numpy', 'pytest', 'pyyaml',
                           'hypothesis', 'pylint', 'flake8', 'pika',
                           'pandas','matplotlib'],
 
