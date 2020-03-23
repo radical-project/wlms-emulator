@@ -3,7 +3,7 @@ import radical.utils as ru
 
 class Core(object):
 
-    def __init__(self, perf=0, no_uid=False, data_rate=0):
+    def __init__(self, perf=0, no_uid=False, data_rate=1):
 
         self._uid = None
         if not no_uid:
