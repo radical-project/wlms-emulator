@@ -3,7 +3,7 @@ import radical.utils as ru
 
 class Core(object):
 
-    def __init__(self, perf=0, no_uid=False):
+    def __init__(self, perf=0, no_uid=False, data_rate=0):
 
         self._uid = None
         if not no_uid:
@@ -11,6 +11,7 @@ class Core(object):
         self._perf = perf
         self._util = list()
         self._task_history = list()
+        self._data_rate = data_rate
 
     @property
     def uid(self):
@@ -39,10 +40,13 @@ class Core(object):
     @task_history.setter
     def task_history(self, val):
         self._task_history = val
+    @data_rate.setter
+    def data_rate(self,val):
+        self._data_rate = val
 
     def execute(self, task):
 
-        dur = task.ops / self._perf
+        dur = task.ops / self._perf + task.ops / self._data_rate
 
         if not self._util:
             task.start_time = 0
@@ -59,7 +63,8 @@ class Core(object):
         return {'uid': self._uid,
                 'perf': self._perf,
                 'util': self._util,
-                'task_history': self._task_history
+                'task_history': self._task_history,
+                'data_rate': self._data_rate
                 }
 
     def from_dict(self, entry):
@@ -68,3 +73,4 @@ class Core(object):
         self._perf = entry['perf']
         self._util = entry['util']
         self._task_history = entry['task_history']
+        self._data_rate = entry['data_rate']
