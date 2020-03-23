@@ -8,7 +8,7 @@ class Resource(object):
 
     def __init__(self, num_cores=1, perf_dist='uniform',
                  dist_mean=10, temporal_var=0, spatial_var=0,
-                 no_uid=False, data_rate=10):
+                 no_uid=False, data_rate=1):
 
         # Initialize
         self._uid = None
@@ -20,6 +20,12 @@ class Resource(object):
                                 actual_type=type(num_cores),
                                 entity='num_cores'
                                 )
+        if not isinstance(data_rate, int):
+            raise CalcTypeError(expected_type=int,
+                                actual_type=type(data_rate),
+                                entity='data_rate'
+                                )
+
         if not isinstance(perf_dist, str):
             raise CalcTypeError(expected_type=str,
                                 actual_type=type(num_cores),
@@ -64,16 +70,16 @@ class Resource(object):
     
     @property
     def num_cores(self):
-        return self._data_rate
-
-    @property
-    def num_cores(self):
         return self._num_cores
+    
+    @property
+    def data_rate(self):
+        return self._data_rate
 
     @property
     def core_list(self):
         return self._core_list
-
+    
     def create_core_list(self):
 
         # Select N samples from the selected distribution
@@ -119,7 +125,7 @@ class Resource(object):
             'temp_var': self._temp_var,
             'spat_var': self._spat_var,
             'core_list': core_list_as_dict,
-            'data_rate':self._data_rate
+            'data_rate': self._data_rate
         }
 
     def from_dict(self, entry):

@@ -22,6 +22,10 @@ class Core(object):
         return self._perf
 
     @property
+    def data_rate(self):
+        return self._data_rate
+
+    @property
     def util(self):
         return self._util
 
