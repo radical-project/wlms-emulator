@@ -8,7 +8,7 @@ class Resource(object):
 
     def __init__(self, num_cores=1, perf_dist='uniform',
                  dist_mean=10, temporal_var=0, spatial_var=0,
-                 no_uid=False):
+                 no_uid=False, data_rate=10):
 
         # Initialize
         self._uid = None
@@ -53,6 +53,7 @@ class Resource(object):
         self._dist_mean = dist_mean
         self._temp_var = temporal_var
         self._spat_var = spatial_var
+        self._data_rate = data_rate
 
         if not no_uid:
             self._uid = ru.generate_id('resource')
@@ -60,6 +61,10 @@ class Resource(object):
     @property
     def uid(self):
         return self._uid
+    
+    @property
+    def num_cores(self):
+        return self._data_rate
 
     @property
     def num_cores(self):
@@ -93,11 +98,12 @@ class Resource(object):
 
         # Create N execution units with the selected samples
         if not self._core_list:
-            self._core_list = [Core(abs(samples[i]))
+            self._core_list = [Core(abs(samples[i]),data_rate)
                                for i in range(self._num_cores)]
         elif self._temp_var:
             for ind, core in enumerate(self._core_list):
                 core.perf = abs(samples[ind])
+                core.data_rate = data_rate
 
     def to_dict(self):
 
@@ -112,7 +118,8 @@ class Resource(object):
             'dist_mean': self._dist_mean,
             'temp_var': self._temp_var,
             'spat_var': self._spat_var,
-            'core_list': core_list_as_dict
+            'core_list': core_list_as_dict,
+            'data_rate':self._data_rate
         }
 
     def from_dict(self, entry):
@@ -123,6 +130,7 @@ class Resource(object):
         self._dist_mean = entry['dist_mean']
         self._temp_var = entry['temp_var']
         self._spat_var = entry['spat_var']
+        self._data_rate = entry['data_rate']
 
         for core in entry['core_list']:
             c = Core(no_uid=True)
