@@ -104,12 +104,12 @@ class Resource(object):
 
         # Create N execution units with the selected samples
         if not self._core_list:
-            self._core_list = [Core(abs(samples[i]),data_rate)
+            self._core_list = [Core(abs(samples[i]),self._data_rate)
                                for i in range(self._num_cores)]
         elif self._temp_var:
             for ind, core in enumerate(self._core_list):
                 core.perf = abs(samples[ind])
-                core.data_rate = data_rate
+                core.data_rate = self._data_rate
 
     def to_dict(self):
 
