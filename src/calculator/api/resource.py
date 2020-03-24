@@ -6,7 +6,7 @@ from ..exceptions import CalcTypeError
 
 class Resource(object):
 
-    def __init__(self, num_cores=1, perf_dist='uniform',
+    def __init__(self, num_cores=1, data_rate=1, perf_dist='uniform',
                  dist_mean=10, temporal_var=0, spatial_var=0,
                  no_uid=False):
 
