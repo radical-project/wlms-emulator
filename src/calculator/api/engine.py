@@ -36,7 +36,7 @@ class Engine(object):
                                 )
 
         res_as_dict = resource.to_dict()
-
+        print(res_as_dict)
         conn = pika.BlockingConnection(
             pika.ConnectionParameters(host=self._host, port=self._port))
         chan = conn.channel()

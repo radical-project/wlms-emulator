@@ -59,4 +59,3 @@ if __name__ == '__main__':
 
     # wl = get_workload()
     # eng.assign_workload(wl, submit_at=35)
-    

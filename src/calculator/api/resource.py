@@ -8,7 +8,7 @@ class Resource(object):
 
     def __init__(self, num_cores=1, perf_dist='uniform',
                  dist_mean=10, temporal_var=0, spatial_var=0,
-                 no_uid=False, data_rate=1):
+                 no_uid=False):
 
         # Initialize
         self._uid = None
