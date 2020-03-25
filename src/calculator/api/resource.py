@@ -6,9 +6,9 @@ from ..exceptions import CalcTypeError
 
 class Resource(object):
 
-    def __init__(self, num_cores=1, data_rate=1, perf_dist='uniform',
+    def __init__(self, num_cores=1, perf_dist='uniform',
                  dist_mean=10, temporal_var=0, spatial_var=0,
-                 no_uid=False):
+                 no_uid=False, data_rate=1):
 
         # Initialize
         self._uid = None
@@ -104,7 +104,7 @@ class Resource(object):
 
         # Create N execution units with the selected samples
         if not self._core_list:
-            self._core_list = [Core(abs(samples[i]),self._data_rate)
+            self._core_list = [Core(abs(samples[i]), self._data_rate)
                                for i in range(self._num_cores)]
         elif self._temp_var:
             for ind, core in enumerate(self._core_list):
