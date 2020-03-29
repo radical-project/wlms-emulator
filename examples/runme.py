@@ -26,7 +26,12 @@ if __name__ == '__main__':
                     dist_mean=32,        # mean of distribution
                     temporal_var=1,     # temporal variance of core performance
                     spatial_var=1,     # spatial variance of core performance
-                    data_rate=0
+                    data_rate=1000,
+                    num_edge=2,
+                    num_fog=2,
+                    num_cloud=1,
+                    dist_mean_edge=3,
+                    dist_mean_fog=5
                   )
 
     # Create WLMS instance with a workload, resource, selection criteria, and

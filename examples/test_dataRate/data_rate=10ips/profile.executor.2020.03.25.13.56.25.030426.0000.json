@@ -1,0 +1,44 @@
+{
+    "engine.2020.03.25.13.56.32.030440.0000": [
+        {
+            "core": "core.js-17-51.jetstream-cloud.org.krb09.018346.0080", 
+            "end_time": 134.19721352354742, 
+            "exec_time": 134.19721352354742, 
+            "ops": 1026.537086036102, 
+            "start_time": 0, 
+            "task": "task.js-17-51.jetstream-cloud.org.krb09.018346.0078"
+        }, 
+        {
+            "core": "core.js-17-51.jetstream-cloud.org.krb09.018346.0081", 
+            "end_time": 133.82637068529075, 
+            "exec_time": 133.82637068529075, 
+            "ops": 1022.5566759121729, 
+            "start_time": 0, 
+            "task": "task.js-17-51.jetstream-cloud.org.krb09.018346.0075"
+        }, 
+        {
+            "core": "core.js-17-51.jetstream-cloud.org.krb09.018346.0082", 
+            "end_time": 135.17447542873253, 
+            "exec_time": 135.17447542873253, 
+            "ops": 1021.2106069024288, 
+            "start_time": 0, 
+            "task": "task.js-17-51.jetstream-cloud.org.krb09.018346.0077"
+        }, 
+        {
+            "core": "core.js-17-51.jetstream-cloud.org.krb09.018346.0083", 
+            "end_time": 133.6552057859565, 
+            "exec_time": 133.6552057859565, 
+            "ops": 1020.5763818818646, 
+            "start_time": 0, 
+            "task": "task.js-17-51.jetstream-cloud.org.krb09.018346.0076"
+        }, 
+        {
+            "core": "core.js-17-51.jetstream-cloud.org.krb09.018346.0084", 
+            "end_time": 134.68730804406312, 
+            "exec_time": 134.68730804406312, 
+            "ops": 1025.558772067439, 
+            "start_time": 0, 
+            "task": "task.js-17-51.jetstream-cloud.org.krb09.018346.0079"
+        }
+    ]
+}
