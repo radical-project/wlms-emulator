@@ -8,7 +8,7 @@ def get_workload():
 
     # Create a workload with a specific number of tasks with number of
     # operations per task drawn from a distribution
-    wl = Workload(  num_tasks=5,          # no. of tasks
+    wl = Workload(  num_tasks=729,          # no. of tasks
                     ops_dist='uniform',     # distribution to draw samples from
                     dist_mean=1024,         # mean of distribution
                     dist_var=4              # variance of distribution
@@ -21,15 +21,15 @@ if __name__ == '__main__':
 
     # Create a resource with a specific number of cores with performance of each
     # core drawn from a distribution
-    res = Resource( num_cores=5,        # no.
+    res = Resource( num_cores=729,        # no.
                     perf_dist='uniform',# distribution to draw samples from
                     dist_mean=32,        # mean of distribution
                     temporal_var=1,     # temporal variance of core performance
                     spatial_var=1,     # spatial variance of core performance
                     data_rate=1000,
-                    num_edge=2,
-                    num_fog=2,
-                    num_cloud=1,
+                    num_edge=81,
+                    num_fog=81,
+                    num_cloud=81,
                     dist_mean_edge=3,
                     dist_mean_fog=5
                   )
