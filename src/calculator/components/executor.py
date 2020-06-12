@@ -36,9 +36,20 @@ class Executor(object):
         self._queue_cfg = cfg['rmq']['executor']['queues']['config']
         self._profile_loc = cfg['rmq']['executor']['profile_loc']
         self._logger.info('Configuration parsed')
-        self._res_dyn = cfg['criteria']['res_dynamism']
-        self._res_het = cfg['criteria']['res_het']
-        self._wl_het = cfg['criteria']['wl_het']
+        if 'res_dynamism' in cfg['criteria']: 
+            self._res_dyn = cfg['criteria']['res_dynamism']
+        else:
+            self._res_dyn = False
+
+        if 'res_het' in cfg['criteria']:
+            self._res_het = cfg['criteria']['res_het']
+        else:
+            self._res_het = False
+
+        if 'wl_het' in cfg['criteria']:
+            self._wl_het = cfg['criteria']['wl_het']
+        else:
+            self._wl_het = False
 
     def _setup_msg_sys(self):
 
