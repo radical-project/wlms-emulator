@@ -39,6 +39,8 @@ class WLMS(object):
 
         self._host = cfg['rmq']['host']
         self._port = cfg['rmq']['port']
+        self._id = cfg['rmq']['id']
+        self._password = cfg['rmq']['password']
         self._exchange = cfg['rmq']['wlms']['exchange']
         self._tgt_exchange = cfg['rmq']['executor']['exchange']
         self._wl_queue = cfg['rmq']['wlms']['queues']['workload']
@@ -79,8 +81,10 @@ class WLMS(object):
 
     def _setup_msg_sys(self):
 
+        credentials = pika.PlainCredentials(self._id, self._password)
+        
         conn = pika.BlockingConnection(
-            pika.ConnectionParameters(host=self._host, port=self._port))
+            pika.ConnectionParameters(host=self._host, port=self._port, credentials = credentials))
         chan = conn.channel()
 
         chan.exchange_declare(exchange=self._exchange, exchange_type='direct')
@@ -106,8 +110,10 @@ class WLMS(object):
 
         try:
 
+            credentials = pika.PlainCredentials(self._id, self._password)
+        
             conn = pika.BlockingConnection(
-                pika.ConnectionParameters(host=self._host, port=self._port))
+                pika.ConnectionParameters(host=self._host, port=self._port, credentials = credentials))
             chan = conn.channel()
 
             def create_schedule(s_mapping, t_mapping):
@@ -125,7 +131,7 @@ class WLMS(object):
             while True:
 
                 method_frame, header_frame, wl = chan.basic_get(queue=self._wl_queue,
-                                                                no_ack=True)
+                                                                auto_ack=True)
                 if wl and not self._workload:
                     wl_as_dict = json.loads(wl)
                     submit_time = wl_as_dict.pop('submit_time')
@@ -136,7 +142,7 @@ class WLMS(object):
                                       self._workload.uid)
 
                 method_frame, header_frame, res = chan.basic_get(queue=self._res_queue,
-                                                                 no_ack=True)
+                                                                 auto_ack=True)
                 if res:
                     self._resource = Resource(no_uid=True)
                     self._resource.from_dict(json.loads(res))
@@ -218,7 +224,7 @@ class WLMS(object):
 
                     while not cores:
                         method_frame, header_frame, cores = chan.basic_get(queue=self._exec_queue,
-                                                                        no_ack=True)
+                                                                        auto_ack=True)
 
                     self._logger.info('Received updates cores')
                     cores_as_dict = json.loads(cores)

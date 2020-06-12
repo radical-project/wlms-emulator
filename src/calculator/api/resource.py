@@ -12,7 +12,7 @@ class Resource(object):
 
         # Initialize
         self._uid = None
-        self._dist_options = ['uniform', 'normal']
+        self._dist_options = ['uniform', 'normal', 'exponential', 'poisson']
         self._core_list = list()
 
         if not isinstance(num_cores, int):
@@ -75,29 +75,52 @@ class Resource(object):
         if self._perf_dist == 'uniform':
             spatial_mean = np.random.uniform(low=self._dist_mean - self._temp_var,
                                              high=self._dist_mean + self._temp_var,
-                                             size=1)[0]
-            samples = list(np.random.uniform(low=spatial_mean - self._spat_var,
-                                        high=spatial_mean + self._spat_var,
-                                        size=self._num_cores))
-        elif self._perf_dist == 'normal':
-            if self._temp_var:
-                spatial_mean = np.random.normal(self._dist_mean,self._temp_var,1)[0]
-            else:
-                spatial_mean = self._dist_mean
+                                             size=self._num_cores)
+            self._samples = list()
+            for i in range(self._num_cores):
+                self._samples.append(np.random.uniform(low=spatial_mean[i] - self._spat_var,
+                                    high=spatial_mean[i] + self._spat_var,
+                                    size=self._num_cores)[0])
 
-            if self._spat_var:
-                samples = list(np.random.normal(spatial_mean, self._spat_var, self._num_cores))
+        elif self._perf_dist == 'normal':
+            if self._temp_var != 0:
+                spatial_param = list(np.random.normal(self._dist_mean, self._temp_var, self._num_cores))
             else:
-                samples = [spatial_mean for _ in range(self._num_cores)]
-            
+                spatial_param = list()
+                for i in range(self._num_cores):
+                    spatial_param.append(self._dist_mean)
+
+            self._samples= list()
+            if self._spat_var != 0:
+                for i in range(self._num_cores):
+                    self._samples.append(np.random.normal(spatial_param[i], self._spat_var, self._num_cores)[0])
+            else:
+                for i in range(self._num_cores):
+                    self._samples.append(spatial_param[i])
+
+        elif self._perf_dist == 'poisson':
+            if self._temp_var != 0:
+                spatial_param = list(np.random.poisson(self._dist_mean, self._num_cores))
+            else:
+                spatial_param = list()
+                for i in range(self._num_cores):
+                    spatial_param.append(self._dist_mean)
+
+            self._samples = list()
+            if self._spat_var != 0:
+                for i in range(self._num_cores):
+                    self._samples.append(np.random.poisson(spatial_param[i], self._num_cores)[0])
+            else:
+                for i in range(self._num_cores):
+                    self._samples.append(spatial_param[i])
 
         # Create N execution units with the selected samples
         if not self._core_list:
-            self._core_list = [Core(abs(samples[i]))
+            self._core_list = [Core(abs(self._samples[i]))
                                for i in range(self._num_cores)]
         elif self._temp_var:
             for ind, core in enumerate(self._core_list):
-                core.perf = abs(samples[ind])
+                core.perf = abs(self._samples[ind])
 
     def to_dict(self):
 

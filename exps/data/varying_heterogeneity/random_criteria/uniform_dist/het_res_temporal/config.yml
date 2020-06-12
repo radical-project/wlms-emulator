@@ -25,11 +25,12 @@ wlms:
     - resource_selection
     - spatial_binding
     - temporal_binding
+  early_binding: True
 
 # RabbitMQ parameters, should not be changed by the user.
 rmq:
   host: 'two.radical-project.org'   # Hostname of the RMQ server
-  port: 33255                       # Port of the RMQ server
+  port: 33202                       # Port of the RMQ server
 
 # Do not change unless you expect a conflict in the RMQ server There is a
 # conflict only if you have multiple concurrent instances of this wlms or

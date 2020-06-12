@@ -28,17 +28,24 @@ class Executor(object):
 
         self._host = cfg['rmq']['host']
         self._port = cfg['rmq']['port']
+        self._id = cfg['rmq']['id']
+        self._password = cfg['rmq']['password']
         self._exchange = cfg['rmq']['executor']['exchange']
         self._wlms_exchange = cfg['rmq']['wlms']['exchange']
         self._queue_schedule = cfg['rmq']['executor']['queues']['schedule']
         self._queue_cfg = cfg['rmq']['executor']['queues']['config']
         self._profile_loc = cfg['rmq']['executor']['profile_loc']
         self._logger.info('Configuration parsed')
+        self._res_dyn = cfg['criteria']['res_dynamism']
+        self._res_het = cfg['criteria']['res_het']
+        self._wl_het = cfg['criteria']['wl_het']
 
     def _setup_msg_sys(self):
 
+        credentials = pika.PlainCredentials(self._id, self._password)
+        
         conn = pika.BlockingConnection(
-            pika.ConnectionParameters(host=self._host, port=self._port))
+            pika.ConnectionParameters(host=self._host, port=self._port, credentials = credentials))
         chan = conn.channel()
 
         chan.exchange_declare(exchange=self._exchange, exchange_type='direct')
@@ -58,18 +65,23 @@ class Executor(object):
         conn = None
 
         try:
-
+            credentials = pika.PlainCredentials(self._id, self._password)
+        
             conn = pika.BlockingConnection(
-                pika.ConnectionParameters(host=self._host, port=self._port))
+                pika.ConnectionParameters(host=self._host, port=self._port, credentials = credentials))
+
             chan = conn.channel()
 
             cfg_msg = None
             cfg = None
 
+            if self._res_dyn and not self._res_het and not self._wl_het:
+                cores_as_dict = dict()
+
             while True:
 
-                method_frame, header_frame, cfg_msg = chan.basic_get(queue=self._queue_cfg,
-                                                                 no_ack=True)
+                method_frame, header_frame, cfg_msg = chan.basic_get(queue=self._queue_cfg, auto_ack=True)
+
                 if cfg_msg:
 
                     tasks = list()
@@ -80,13 +92,14 @@ class Executor(object):
 
                     self._logger.info('Engine uid received')
 
-                method_frame, header_frame, schedule = chan.basic_get(queue=self._queue_schedule,
-                                                                      no_ack=True)
-                if schedule:
+                method_frame, header_frame, schedule = chan.basic_get(queue=self._queue_schedule, auto_ack=True)
 
+                if schedule:
                     tasks = list()
                     schedule_as_dict = json.loads(schedule)
-                    cores_as_dict = dict()
+                     
+                    if not (self._res_dyn and not self._res_het and not self._wl_het):
+                        cores_as_dict = dict()
 
                     for s in schedule_as_dict:
                         task = Task(no_uid=True)
@@ -98,6 +111,10 @@ class Executor(object):
                             cores_as_dict[s['core']['uid']] = core
                         else:
                             core = cores_as_dict[s['core']['uid']]
+                            if self._res_dyn and not self._res_het and not self._wl_het:
+                                core_temp = Core(no_uid=True)
+                                core_temp.from_dict(s['core'])
+                                core._perf = core_temp._perf
 
                         core.execute(task)
                         tasks.append(task)
@@ -119,6 +136,8 @@ class Executor(object):
         except KeyboardInterrupt:
 
             if conn:
+                # delete the queue generated to avoid possible conflict in the RMQ server 
+                chan.queue_delete(queue = 'schedule')
                 conn.close()
             self._write_profile()
 
@@ -127,6 +146,8 @@ class Executor(object):
         except Exception as ex:
 
             if conn:
+                # delete the queue generated to avoid possible conflict in the RMQ server 
+                chan.queue_delete(queue = 'schedule')
                 conn.close()
 
             self._logger.exception('Executor failed with %s' % ex)

@@ -24,6 +24,8 @@ class Engine(object):
 
         self._host = cfg['rmq']['host']
         self._port = cfg['rmq']['port']
+        self._id = cfg['rmq']['id']
+        self._password = cfg['rmq']['password']
         self._wlms_exchange = cfg['rmq']['wlms']['exchange']
         self._executor_exchange = cfg['rmq']['executor']['exchange']
         self._logger.info('Configuration parsed')
@@ -37,8 +39,10 @@ class Engine(object):
 
         res_as_dict = resource.to_dict()
 
+        credentials = pika.PlainCredentials(self._id, self._password)
+        
         conn = pika.BlockingConnection(
-            pika.ConnectionParameters(host=self._host, port=self._port))
+            pika.ConnectionParameters(host=self._host, port=self._port, credentials = credentials))
         chan = conn.channel()
 
         chan.basic_publish(body=json.dumps(res_as_dict),
@@ -52,8 +56,10 @@ class Engine(object):
 
         cfg_as_dict = {'engine_uid': self._uid}
 
+        credentials = pika.PlainCredentials(self._id, self._password)
+        
         conn = pika.BlockingConnection(
-            pika.ConnectionParameters(host=self._host, port=self._port))
+            pika.ConnectionParameters(host=self._host, port=self._port, credentials = credentials))
         chan = conn.channel()
 
         chan.basic_publish(body=json.dumps(cfg_as_dict),
@@ -73,8 +79,10 @@ class Engine(object):
         wl_as_dict = workload.to_dict()
         wl_as_dict['submit_time'] = submit_at
 
+        credentials = pika.PlainCredentials(self._id, self._password)
+        
         conn = pika.BlockingConnection(
-            pika.ConnectionParameters(host=self._host, port=self._port))
+            pika.ConnectionParameters(host=self._host, port=self._port, credentials = credentials))
         chan = conn.channel()
 
         chan.basic_publish(body=json.dumps(wl_as_dict),

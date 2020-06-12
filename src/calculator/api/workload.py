@@ -10,7 +10,7 @@ class Workload(object):
         # Initialize
 
         self._uid = None
-        self._dist_options = ['uniform', 'normal']
+        self._dist_options = ['uniform', 'normal', 'poisson']
         self._task_list = list()
 
         if ops_dist not in self._dist_options:
@@ -50,6 +50,10 @@ class Workload(object):
                 self._samples = list(np.random.normal(self._dist_mean, self._dist_var, self._num_tasks))
             else:
                 self._samples = [self._dist_mean for _ in range(self._num_tasks)]
+
+        elif self._ops_dist == 'poisson':
+            scale_param = self._dist_mean
+            self._samples = list(np.random.poisson(scale_param, self._num_tasks))
 
         # Create N tasks with the selected samples
         self._task_list = [Task(self._samples[i])
