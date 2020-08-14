@@ -1,0 +1,68 @@
+{
+    "engine.2020.08.14.03.06.42.029949.0000": [
+        {
+            "core": "core.js-17-185.jetstream-cloud.org.aydins.018488.0352", 
+            "end_time": 28.768509555786807, 
+            "exec_time": 28.768509555786807, 
+            "ops": 977.4543295815818, 
+            "start_time": 0, 
+            "task": "task.js-17-185.jetstream-cloud.org.aydins.018488.0345"
+        }, 
+        {
+            "core": "core.js-17-185.jetstream-cloud.org.aydins.018488.0353", 
+            "end_time": 29.46589155632431, 
+            "exec_time": 29.46589155632431, 
+            "ops": 987.379395406568, 
+            "start_time": 0, 
+            "task": "task.js-17-185.jetstream-cloud.org.aydins.018488.0343"
+        }, 
+        {
+            "core": "core.js-17-185.jetstream-cloud.org.aydins.018488.0351", 
+            "end_time": 31.04407565981344, 
+            "exec_time": 31.04407565981344, 
+            "ops": 992.624181871026, 
+            "start_time": 0, 
+            "task": "task.js-17-185.jetstream-cloud.org.aydins.018488.0346"
+        }, 
+        {
+            "core": "core.js-17-185.jetstream-cloud.org.aydins.018488.0350", 
+            "end_time": 32.78854939318826, 
+            "exec_time": 32.78854939318826, 
+            "ops": 996.2152545735439, 
+            "start_time": 0, 
+            "task": "task.js-17-185.jetstream-cloud.org.aydins.018488.0347"
+        }, 
+        {
+            "core": "core.js-17-185.jetstream-cloud.org.aydins.018488.0353", 
+            "end_time": 61.27681825336032, 
+            "exec_time": 31.81092669703601, 
+            "ops": 1074.4995489927517, 
+            "start_time": 29.46589155632431, 
+            "task": "task.js-17-185.jetstream-cloud.org.aydins.018488.0342"
+        }, 
+        {
+            "core": "core.js-17-185.jetstream-cloud.org.aydins.018488.0350", 
+            "end_time": 66.81024041997655, 
+            "exec_time": 34.02169102678829, 
+            "ops": 1087.54395056579, 
+            "start_time": 32.78854939318826, 
+            "task": "task.js-17-185.jetstream-cloud.org.aydins.018488.0344"
+        }, 
+        {
+            "core": "core.js-17-185.jetstream-cloud.org.aydins.018488.0351", 
+            "end_time": 62.25697519468608, 
+            "exec_time": 31.212899534872637, 
+            "ops": 1019.6397144077407, 
+            "start_time": 31.04407565981344, 
+            "task": "task.js-17-185.jetstream-cloud.org.aydins.018488.0348"
+        }, 
+        {
+            "core": "core.js-17-185.jetstream-cloud.org.aydins.018488.0352", 
+            "end_time": 64.23293691367758, 
+            "exec_time": 35.46442735789077, 
+            "ops": 1074.9300611926035, 
+            "start_time": 28.768509555786807, 
+            "task": "task.js-17-185.jetstream-cloud.org.aydins.018488.0349"
+        }
+    ]
+}
