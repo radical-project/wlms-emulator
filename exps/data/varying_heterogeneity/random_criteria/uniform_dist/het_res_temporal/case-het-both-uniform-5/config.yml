@@ -36,10 +36,8 @@ wlms:
 rmq:
   host: '129.114.17.185' #'two.radical-project.org'   # Hostname of the RMQ server
   port: 5672 #33239 #27017 #33202                       # Port of the RMQ server
-  id: 'aydins'
-  password: 'qaA7T5sfwM8P9K8r'
-  #id: 'your_id'
-  #password: 'your_password'
+  id: 'your_id'
+  password: 'your_password'
 # Do not change unless you expect a conflict in the RMQ server There is a
 # conflict only if you have multiple concurrent instances of this wlms or
 # other processes/applications are using the same exchange and queue names
