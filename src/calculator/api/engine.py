@@ -64,7 +64,7 @@ class Engine(object):
 
         chan.basic_publish(body=json.dumps(cfg_as_dict),
                            exchange=self._executor_exchange,
-                           routing_key='cfg'
+                           routing_key='cfg_as'
                            )
 
         conn.close()

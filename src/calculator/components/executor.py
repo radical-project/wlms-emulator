@@ -5,6 +5,7 @@ from yaml import load
 import pika
 import json
 import os
+from algorithms.spatial_binding_algos import largest_to_first_available
 
 
 class Executor(object):
@@ -36,20 +37,18 @@ class Executor(object):
         self._queue_cfg = cfg['rmq']['executor']['queues']['config']
         self._profile_loc = cfg['rmq']['executor']['profile_loc']
         self._logger.info('Configuration parsed')
+        self._early_binding = cfg['wlms']['early_binding']
+        self._core_dist_type = cfg['criteria']['core_dist']
+        self._core_dist_mean = cfg['criteria']['core_mean']
+        self._core_dist_temp_var = cfg['criteria']['core_temp_var']
+        if 'l2fare' in cfg['criteria']:
+            self._l2fare = cfg['criteria']['l2fare']
+        else:
+            self._l2fare = False
         if 'res_dynamism' in cfg['criteria']: 
             self._res_dyn = cfg['criteria']['res_dynamism']
         else:
             self._res_dyn = False
-
-        if 'res_het' in cfg['criteria']:
-            self._res_het = cfg['criteria']['res_het']
-        else:
-            self._res_het = False
-
-        if 'wl_het' in cfg['criteria']:
-            self._wl_het = cfg['criteria']['wl_het']
-        else:
-            self._wl_het = False
 
     def _setup_msg_sys(self):
 
@@ -63,11 +62,11 @@ class Executor(object):
 
         chan.queue_declare(queue=self._queue_schedule)
         chan.queue_bind(queue=self._queue_schedule,
-                        exchange=self._exchange, routing_key='schedule')
+                        exchange=self._exchange, routing_key='schedule_as')
 
         chan.queue_declare(queue=self._queue_cfg)
         chan.queue_bind(queue=self._queue_cfg,
-                        exchange=self._exchange, routing_key='cfg')
+                        exchange=self._exchange, routing_key='cfg_as')
 
         self._logger.info('Messaging system established')
 
@@ -86,13 +85,13 @@ class Executor(object):
             cfg_msg = None
             cfg = None
 
-            if self._res_dyn and not self._res_het and not self._wl_het:
+            if self._res_dyn:
                 cores_as_dict = dict()
 
             while True:
 
-                method_frame, header_frame, cfg_msg = chan.basic_get(queue=self._queue_cfg, auto_ack=True)
-
+                method_frame, header_frame, cfg_msg = chan.basic_get(queue=self._queue_cfg) #,
+                                                                     # no_ack=True)
                 if cfg_msg:
 
                     tasks = list()
@@ -103,29 +102,53 @@ class Executor(object):
 
                     self._logger.info('Engine uid received')
 
-                method_frame, header_frame, schedule = chan.basic_get(queue=self._queue_schedule, auto_ack=True)
+                method_frame, header_frame, schedule = chan.basic_get(queue=self._queue_schedule) # ,
+                                                                      #no_ack=True)
 
                 if schedule:
                     tasks = list()
                     schedule_as_dict = json.loads(schedule)
                      
-                    if not (self._res_dyn and not self._res_het and not self._wl_het):
+                    if not self._res_dyn:
                         cores_as_dict = dict()
+
+                    if self._l2fare and not self._early_binding:
+                        if schedule_as_dict[0]['core']['uid'] in cores_as_dict.keys():
+                            schedule_as_dict = largest_to_first_available(schedule_as_dict, cores_as_dict)
 
                     for s in schedule_as_dict:
                         task = Task(no_uid=True)
                         task.from_dict(s['task'])
 
+                        #print "--------------------------------------------------------"
                         if s['core']['uid'] not in cores_as_dict.keys():
+                            #print "-------------------1st gen------------------------------"
+                            #print "task ops ", s['task']['uid']
                             core = Core(no_uid=True)
+                            #print "s[core] ", s['core']
                             core.from_dict(s['core'])
                             cores_as_dict[s['core']['uid']] = core
+                            #print "core perf ", core._perf
                         else:
+                            #print "-------------------2nd gen------------------------------"
+                            #print "task uid: ", s['task']['uid']
                             core = cores_as_dict[s['core']['uid']]
-                            if self._res_dyn and not self._res_het and not self._wl_het:
-                                core_temp = Core(no_uid=True)
-                                core_temp.from_dict(s['core'])
-                                core._perf = core_temp._perf
+                            if self._res_dyn and not self._l2fare:
+                                if not self._early_binding:
+                                    #print(s['core'])
+                                    #print(core._task_history)
+                                    core_temp = Core(no_uid=True)
+                                    core_temp.from_dict(s['core'])
+                                    #print(core._perf)
+                                    #print(core_temp._perf)
+                                    core._perf = core_temp._perf
+                                else:
+                                    core.refresh_perf(self._core_dist_type, self._core_dist_mean, self._core_dist_temp_var)
+                        #print "CORE UID: ", s['core']['uid']
+                        #print "CORE'S TASK HISTORY", core._task_history
+                        #print "CORE PERF:", core._perf
+                        #print "TASK UID:", task.uid
+                        #print "TASK LENGTH:", task.ops
 
                         core.execute(task)
                         tasks.append(task)
@@ -148,7 +171,7 @@ class Executor(object):
 
             if conn:
                 # delete the queue generated to avoid possible conflict in the RMQ server 
-                chan.queue_delete(queue = 'schedule')
+                chan.queue_delete(queue = 'schedule_as')
                 conn.close()
             self._write_profile()
 
@@ -158,7 +181,7 @@ class Executor(object):
 
             if conn:
                 # delete the queue generated to avoid possible conflict in the RMQ server 
-                chan.queue_delete(queue = 'schedule')
+                chan.queue_delete(queue = 'schedule_as')
                 conn.close()
 
             self._logger.exception('Executor failed with %s' % ex)
@@ -184,7 +207,6 @@ class Executor(object):
         base = os.path.dirname(self._profile_loc)
         fname, ext = os.path.basename(self._profile_loc).split('.')
         op_name = base + '/' + fname + '.%s.' % self._uid + ext
-
         ru.write_json(data=self._profile, filename=op_name)
         self._logger.info(
             'Profiles from executor %s written to %s' % (self._uid, op_name))

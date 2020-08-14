@@ -1,4 +1,5 @@
 import radical.utils as ru
+import numpy as np
 
 
 class Core(object):
@@ -40,6 +41,20 @@ class Core(object):
     def task_history(self, val):
         self._task_history = val
 
+    def refresh_perf(self, dist_val, mean_val, temp_var):
+        if dist_val == 'uniform':
+            self._perf = np.random.uniform(low = mean_val - temp_var, high = mean_val + temp_var, size=1)[0]
+        elif dist_val == 'normal':
+            self._perf = np.random.normal(mean_val, temp_var, 1)[0]
+        elif dist_val == 'poisson':
+            if temp_var == 0:
+                self._perf = mean_val
+            else:
+                self._perf = np.random.poisson(mean_val, 1)[0]
+        else:
+            self._perf = mean_val
+
+        
     def execute(self, task):
 
         dur = task.ops / self._perf

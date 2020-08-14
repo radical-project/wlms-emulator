@@ -9,6 +9,7 @@ from yaml import load
 import pika
 import json
 from ..exceptions import CalcError
+from ..entities.core import Core
 
 
 class WLMS(object):
@@ -55,7 +56,7 @@ class WLMS(object):
 
         valid_ts_criteria = ['all']
         valid_rs_criteria = ['all']
-        valid_sb_criteria = ['rr', 'l2f', 's2f', 'random']
+        valid_sb_criteria = ['rr', 'l2f', 'l2f_alt', 's2f', 'random']
         valid_tb_criteria = ['ff', 'sf', 'random']
 
         task_selection_criteria = cfg['task_selector']
@@ -111,13 +112,12 @@ class WLMS(object):
         try:
 
             credentials = pika.PlainCredentials(self._id, self._password)
-        
+            
             conn = pika.BlockingConnection(
                 pika.ConnectionParameters(host=self._host, port=self._port, credentials = credentials))
             chan = conn.channel()
 
             def create_schedule(s_mapping, t_mapping):
-
                 schedule = list()
                 for t1 in t_mapping:
                     for item in s_mapping:
@@ -130,8 +130,7 @@ class WLMS(object):
 
             while True:
 
-                method_frame, header_frame, wl = chan.basic_get(queue=self._wl_queue,
-                                                                auto_ack=True)
+                method_frame, header_frame, wl = chan.basic_get(queue=self._wl_queue, auto_ack=True)
                 if wl and not self._workload:
                     wl_as_dict = json.loads(wl)
                     submit_time = wl_as_dict.pop('submit_time')
@@ -141,8 +140,7 @@ class WLMS(object):
                     self._logger.info('Workload %s received' %
                                       self._workload.uid)
 
-                method_frame, header_frame, res = chan.basic_get(queue=self._res_queue,
-                                                                 auto_ack=True)
+                method_frame, header_frame, res = chan.basic_get(queue=self._res_queue, auto_ack=True)
                 if res:
                     self._resource = Resource(no_uid=True)
                     self._resource.from_dict(json.loads(res))
@@ -153,7 +151,11 @@ class WLMS(object):
 
                     if not self._early_binding or (self._resource.uid not in resource_visited):
                         self._resource.create_core_list()
+
+                        res_as_dict = self._resource.to_dict()
                         self._logger.info("Resource core list created")
+                        self._logger.info('from resource: samples=%s' % self._resource._samples)
+
                         if self._resource.uid not in resource_visited:
                             resource_visited.append(self._resource.uid)
 
@@ -214,7 +216,7 @@ class WLMS(object):
                         schedule_as_dict.append(tmp)
 
                     chan.basic_publish(exchange=self._tgt_exchange,
-                                       routing_key='schedule',
+                                       routing_key='schedule_as',
                                        body=json.dumps(schedule_as_dict))
 
                     self._logger.info('Schedule published to executor')
@@ -223,8 +225,7 @@ class WLMS(object):
                     cores = None
 
                     while not cores:
-                        method_frame, header_frame, cores = chan.basic_get(queue=self._exec_queue,
-                                                                        auto_ack=True)
+                        method_frame, header_frame, cores = chan.basic_get(queue=self._exec_queue, auto_ack=True)
 
                     self._logger.info('Received updates cores')
                     cores_as_dict = json.loads(cores)

@@ -1,14 +1,13 @@
 import radical.utils as ru
-from ..algorithms.spatial_binding_algos import round_robin, largest_to_fastest, smallest_to_fastest, random_placer
+from ..algorithms.spatial_binding_algos import round_robin, largest_to_fastest, largest_to_fastest_alt, smallest_to_fastest, random_placer
 from ...exceptions import CalcValueError
 
 
 class Spatial_Binder(object):
 
     def __init__(self):
-
         self._uid = ru.generate_id('binder')
-        self._criteria_options = ['rr', 'l2f', 's2f', 'random']
+        self._criteria_options = ['rr', 'l2f', 'l2f_alt', 's2f', 'random']
         self._criteria = None
         self._schedule = None
 
@@ -30,7 +29,6 @@ class Spatial_Binder(object):
         self._criteria = val
 
     def bind(self, workload, resource):
-
         if not self._criteria:
             raise CalcValueError(obj=self._uid, attribute='criteria',
                                  expected_value=self._criteria_options,
@@ -41,6 +39,9 @@ class Spatial_Binder(object):
 
         elif self._criteria == 'l2f':
             self._schedule = largest_to_fastest(workload, resource)
+
+        elif self._criteria == 'l2f_alt':
+            self._schedule = largest_to_fastest_alt(workload, resource)
 
         elif self._criteria == 's2f':
             self._schedule = smallest_to_fastest(workload, resource)
